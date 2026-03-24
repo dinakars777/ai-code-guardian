@@ -1,5 +1,17 @@
 # 🛡️ AI Code Guardian
 
+<div align="center">
+
+[![Crates.io](https://img.shields.io/crates/v/ai-code-guardian?style=for-the-badge)](https://crates.io/crates/ai-code-guardian)
+[![Downloads](https://img.shields.io/crates/d/ai-code-guardian?style=for-the-badge)](https://crates.io/crates/ai-code-guardian)
+[![License](https://img.shields.io/crates/l/ai-code-guardian?style=for-the-badge)](LICENSE)
+
+**[🌐 Interactive Demo & Documentation](https://dinakars777.github.io/ai-code-guardian/)**
+
+</div>
+
+---
+
 Security scanner for AI-generated code. Catches vulnerabilities before you commit.
 
 ## The Problem
