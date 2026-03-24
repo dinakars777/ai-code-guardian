@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **Dependency vulnerability checking** - Scan requirements.txt, package.json, Cargo.toml for known CVEs
 - **.guardianignore file** - Exclude files/patterns from scanning
 - **Git integration** - Scan only changed or staged files for faster CI/CD
 - **Custom rules engine** - Define your own security patterns with `.guardian.rules.json`
@@ -53,8 +54,10 @@ ai-guardian scan --git
 # Scan only git staged files
 ai-guardian scan --staged
 
-# Scan with JSON output
-ai-guardian scan --json
+# Check dependencies for vulnerabilities
+ai-guardian check-deps requirements.txt
+ai-guardian check-deps package.json
+ai-guardian check-deps Cargo.toml
 ```
 
 ## What It Detects
@@ -186,6 +189,12 @@ Found a false positive? Have a pattern to add? PRs welcome!
 MIT
 
 ## Changelog
+
+### v0.10.0
+- Added dependency vulnerability checking with `check-deps` command
+- Integrates with OSV.dev API to detect known CVEs in dependencies
+- Supports Python (requirements.txt, pyproject.toml), Node (package.json), Rust (Cargo.toml)
+- Released in response to LiteLLM supply chain attack (March 2026)
 
 ### v0.9.0
 - Improved SQL injection detection to reduce false positives from logging statements

@@ -10,6 +10,7 @@ mod watch;
 mod custom_rules;
 mod git;
 mod ignore;
+mod deps;
 
 use scanner::Scanner;
 
@@ -65,6 +66,16 @@ enum Commands {
         /// Show all issues including low severity
         #[arg(short, long)]
         verbose: bool,
+    },
+
+    /// Check dependencies for known vulnerabilities
+    CheckDeps {
+        /// Path to dependency file (requirements.txt, package.json, Cargo.toml, pyproject.toml)
+        path: String,
+
+        /// Output results as JSON
+        #[arg(short, long)]
+        json: bool,
     },
 }
 
@@ -123,6 +134,99 @@ fn main() -> Result<()> {
         }
         Commands::Watch { path, verbose } => {
             watch::watch_directory(&path, verbose)?;
+        }
+        Commands::CheckDeps { path, json } => {
+            tokio::runtime::Runtime::new()?.block_on(async {
+                check_dependencies(&path, json).await
+            })?;
+        }
+    }
+
+    Ok(())
+}
+
+async fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
+    use std::path::Path;
+    
+    let path = Path::new(file_path);
+    
+    if !path.exists() {
+        anyhow::bail!("File not found: {}", file_path);
+    }
+
+    if !json_output {
+        println!("{}", "🛡️  AI Code Guardian - Dependency Check".cyan().bold());
+        println!();
+        println!("Checking: {}", file_path.yellow());
+        println!();
+    }
+
+    let dependencies = deps::parse_dependencies(path)?;
+    
+    if dependencies.is_empty() {
+        println!("No dependencies found");
+        return Ok(());
+    }
+
+    if !json_output {
+        println!("Found {} dependencies, checking for vulnerabilities...", dependencies.len());
+        println!();
+    }
+
+    let mut total_vulns = 0;
+    let mut results = Vec::new();
+
+    for dep in &dependencies {
+        let vulns = deps::check_vulnerability(dep).await?;
+        
+        if !vulns.is_empty() {
+            total_vulns += vulns.len();
+            
+            if json_output {
+                results.push(serde_json::json!({
+                    "package": &dep.name,
+                    "version": &dep.version,
+                    "ecosystem": &dep.ecosystem,
+                    "vulnerabilities": vulns,
+                }));
+            } else {
+                for vuln in &vulns {
+                    let severity_str = vuln.severity.as_deref().unwrap_or("UNKNOWN");
+                    let severity_colored = match severity_str {
+                        "CRITICAL" | "HIGH" => severity_str.red().bold(),
+                        "MEDIUM" | "MODERATE" => severity_str.yellow().bold(),
+                        _ => severity_str.blue().bold(),
+                    };
+
+                    println!("❌ {}: {}", severity_colored, vuln.id.red().bold());
+                    println!("   Package: {}@{} ({})", dep.name.cyan(), dep.version, dep.ecosystem);
+                    println!("   Summary: {}", vuln.summary);
+                    
+                    if !vuln.references.is_empty() {
+                        println!("   References:");
+                        for reference in &vuln.references {
+                            println!("     - {}", reference.url.blue());
+                        }
+                    }
+                    println!();
+                }
+            }
+        }
+    }
+
+    if json_output {
+        println!("{}", serde_json::to_string_pretty(&serde_json::json!({
+            "total_dependencies": dependencies.len(),
+            "vulnerable_packages": results.len(),
+            "total_vulnerabilities": total_vulns,
+            "results": results,
+        }))?);
+    } else {
+        if total_vulns == 0 {
+            println!("{}", "✅ No known vulnerabilities found!".green().bold());
+        } else {
+            println!("{}", format!("Found {} vulnerabilities in {} packages", total_vulns, results.len()).red().bold());
+            std::process::exit(1);
         }
     }
 
