@@ -52,7 +52,7 @@ lazy_static::lazy_static! {
             title: "SQL Injection Risk",
             description: "String concatenation in SQL query. Use parameterized queries.",
             severity: Severity::High,
-            regex: Regex::new(r#"(?i)(SELECT|INSERT|UPDATE|DELETE).*\+.*["']"#).unwrap(),
+            regex: Regex::new(r#"(?i)(?:SELECT|INSERT|UPDATE|DELETE)\s+(?:FROM|INTO|SET).*\+.*["']"#).unwrap(),
             fix_suggestion: "Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])",
         },
         

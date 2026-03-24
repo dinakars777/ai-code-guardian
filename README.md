@@ -153,3 +153,10 @@ Found a false positive? Have a pattern to add? PRs welcome!
 ## License
 
 MIT
+
+## Changelog
+
+### v0.9.0
+- Improved SQL injection detection to reduce false positives from logging statements
+- Pattern now requires SQL keywords (SELECT/INSERT/UPDATE/DELETE) to be followed by FROM/INTO/SET
+- Eliminates false positives from code like `LOG_WARNING("Health was to be updated to: " + value)`
