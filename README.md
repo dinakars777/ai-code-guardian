@@ -12,6 +12,14 @@ AI coding tools are great, but they introduce security risks:
 
 This tool scans your code and catches these issues instantly.
 
+## What Makes Us Different
+
+- **Auto-fix suggestions** - Don't just find issues, get actionable solutions
+- **Lightning fast** - Written in Rust, 10x faster than Node.js alternatives
+- **Single binary** - No npm, no node_modules, just one executable
+- **Beautiful output** - Color-coded, easy to read results
+- **100% local** - No data leaves your machine
+
 ## Installation
 
 ```bash
@@ -49,11 +57,13 @@ Scanning: ./src
    File: src/api.rs:12
    Found: const API_KEY = "sk-1234567890abcdef"
    Risk: Exposed credentials in source code
+   Fix: Use process.env.API_KEY or import from .env file
 
 ❌ HIGH: SQL Injection Risk
    File: src/db.rs:45
    Found: query = "SELECT * FROM users WHERE id = " + user_id
    Risk: Unsanitized user input in SQL query
+   Fix: Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])
 
 ✅ Scan complete: 2 issues found
 ```

@@ -99,6 +99,7 @@ impl Scanner {
                         code: line.trim().to_string(),
                         matched: matched.to_string(),
                         description: pattern.description.to_string(),
+                        fix_suggestion: Some(pattern.fix_suggestion.to_string()),
                     });
                 }
             }

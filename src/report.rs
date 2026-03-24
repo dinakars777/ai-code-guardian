@@ -17,6 +17,7 @@ pub struct Issue {
     pub code: String,
     pub matched: String,
     pub description: String,
+    pub fix_suggestion: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -112,6 +113,12 @@ impl Report {
             println!("   {}: {}", "Match".dimmed(), issue.matched.yellow());
         }
         println!("   {}: {}", "Risk".dimmed(), issue.description);
+        
+        // Print fix suggestion if available
+        if let Some(fix) = &issue.fix_suggestion {
+            println!("   {}: {}", "Fix".green().bold(), fix.green());
+        }
+        
         println!();
     }
 }

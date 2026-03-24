@@ -283,16 +283,19 @@ Scanning: ./src
    <span class="file">File: api.js:12</span>
    <span class="file">Code:</span> <span class="code">const API_KEY = "sk-1234567890abcdef"</span>
    <span class="file">Risk: API key found in source code. Store in environment variables instead.</span>
+   <span style="color: #3fb950; font-weight: bold;">Fix: Use process.env.API_KEY or import from .env file</span>
 
 <span class="high">❌ HIGH: SQL Injection Risk</span>
    <span class="file">File: db.js:45</span>
    <span class="file">Code:</span> <span class="code">query = "SELECT * FROM users WHERE id = " + userId</span>
    <span class="file">Risk: String concatenation in SQL query. Use parameterized queries.</span>
+   <span style="color: #3fb950; font-weight: bold;">Fix: Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])</span>
 
 <span class="medium">❌ MEDIUM: Insecure HTTP Connection</span>
    <span class="file">File: api.js:8</span>
    <span class="file">Code:</span> <span class="code">fetch("http://api.example.com/data")</span>
    <span class="file">Risk: Using HTTP instead of HTTPS. Data transmitted in plain text.</span>
+   <span style="color: #3fb950; font-weight: bold;">Fix: Change to HTTPS: https://...</span>
 
 <span style="color: #e6edf3; font-weight: bold;">Scan complete: 3 issues found (2 high, 1 medium, 0 low)</span>
 Scanned 15 files
@@ -305,9 +308,21 @@ Scanned 15 files
             <h2>Why AI Code Guardian?</h2>
             <div class="feature-grid">
                 <div class="feature">
+                    <div class="feature-icon">💡</div>
+                    <h3>Auto-Fix Suggestions</h3>
+                    <p>Don't just find issues - get actionable fixes. Every vulnerability includes a specific solution.</p>
+                </div>
+
+                <div class="feature">
                     <div class="feature-icon">⚡</div>
                     <h3>Lightning Fast</h3>
-                    <p>Written in Rust. Scans entire codebases in seconds.</p>
+                    <p>Written in Rust. Scans entire codebases in seconds. 10x faster than Node.js alternatives.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📦</div>
+                    <h3>Single Binary</h3>
+                    <p>No npm, no node_modules, no dependencies. Just one executable.</p>
                 </div>
 
                 <div class="feature">
@@ -323,21 +338,9 @@ Scanned 15 files
                 </div>
 
                 <div class="feature">
-                    <div class="feature-icon">🆓</div>
-                    <h3>Free & Open Source</h3>
-                    <p>MIT licensed. Use it anywhere, modify as needed.</p>
-                </div>
-
-                <div class="feature">
                     <div class="feature-icon">🎨</div>
                     <h3>Beautiful Output</h3>
-                    <p>Color-coded, easy to read results.</p>
-                </div>
-
-                <div class="feature">
-                    <div class="feature-icon">🔗</div>
-                    <h3>CI/CD Ready</h3>
-                    <p>Integrates with pre-commit hooks and pipelines.</p>
+                    <p>Color-coded, easy to read results with clear explanations.</p>
                 </div>
             </div>
         </div>
