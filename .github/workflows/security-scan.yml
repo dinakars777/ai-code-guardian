@@ -1,0 +1,30 @@
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for git diff
+    
+    - name: Install AI Code Guardian
+      run: |
+        cargo install ai-code-guardian
+    
+    - name: Scan changed files in PR
+      if: github.event_name == 'pull_request'
+      run: |
+        ai-guardian scan --git
+    
+    - name: Scan all files on push
+      if: github.event_name == 'push'
+      run: |
+        ai-guardian scan .

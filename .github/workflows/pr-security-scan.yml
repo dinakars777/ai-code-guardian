@@ -1,0 +1,81 @@
+name: PR Security Scan
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install AI Code Guardian
+      run: cargo install ai-code-guardian
+    
+    - name: Scan changed files
+      id: scan
+      continue-on-error: true
+      run: |
+        ai-guardian scan --git > scan-results.txt 2>&1
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+    
+    - name: Post results as PR comment
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const results = fs.readFileSync('scan-results.txt', 'utf8');
+          const exitCode = '${{ steps.scan.outputs.exit_code }}';
+          
+          let body = '## 🛡️ AI Code Guardian Security Scan\n\n';
+          
+          if (exitCode === '0') {
+            body += '✅ **No security issues found!**\n\n';
+          } else {
+            body += '⚠️ **Security issues detected:**\n\n';
+            body += '```\n' + results + '\n```\n\n';
+            body += '---\n';
+            body += '*Fix these issues before merging. See [AI Code Guardian](https://github.com/dinakars777/ai-code-guardian) for details.*';
+          }
+          
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('AI Code Guardian Security Scan')
+          );
+          
+          if (botComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: body
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+          }
+    
+    - name: Fail if issues found
+      if: steps.scan.outputs.exit_code != '0'
+      run: exit 1

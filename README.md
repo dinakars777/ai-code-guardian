@@ -86,7 +86,36 @@ Scanning: ./src
 ✅ Scan complete: 2 issues found
 ```
 
-## Pre-commit Hook
+## CI/CD Integration
+
+### GitHub Actions
+
+Scan PRs automatically. Create `.github/workflows/security.yml`:
+
+```yaml
+name: Security Scan
+
+on:
+  pull_request:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install AI Code Guardian
+      run: cargo install ai-code-guardian
+    
+    - name: Scan changed files
+      run: ai-guardian scan --git
+```
+
+See `examples/` directory for more GitHub Action configurations.
+
+### Pre-commit Hook
 
 Add to `.git/hooks/pre-commit`:
 
@@ -140,10 +169,12 @@ No data leaves your machine. Everything runs locally.
 
 ## Roadmap
 
+- [x] Git integration to scan only changed files
+- [x] GitHub Actions examples
 - [ ] Auto-fix command to apply fixes automatically
 - [ ] XSS detection patterns
 - [ ] Path traversal detection
-- [ ] CI/CD GitHub Action
+- [ ] Official GitHub Action (no cargo install needed)
 - [ ] VS Code extension
 
 ## Contributing

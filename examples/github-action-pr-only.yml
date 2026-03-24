@@ -1,0 +1,21 @@
+# Scan only changed files in PRs (faster for large repos)
+# Copy this to .github/workflows/security.yml in your repo
+
+name: PR Security Scan
+
+on:
+  pull_request:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Need full history for git diff
+    
+    - name: Install AI Code Guardian
+      run: cargo install ai-code-guardian
+    
+    - name: Scan only changed files
+      run: ai-guardian scan --git
