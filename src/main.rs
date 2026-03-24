@@ -8,6 +8,7 @@ mod report;
 mod tui;
 mod watch;
 mod custom_rules;
+mod git;
 
 use scanner::Scanner;
 
@@ -44,6 +45,14 @@ enum Commands {
         /// Interactive TUI mode
         #[arg(short, long)]
         interactive: bool,
+
+        /// Only scan git changed files
+        #[arg(short, long)]
+        git: bool,
+
+        /// Only scan git staged files
+        #[arg(short, long)]
+        staged: bool,
     },
     
     /// Watch directory for changes and scan automatically
@@ -62,8 +71,29 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Scan { path, json, verbose, interactive } => {
-            let scanner = Scanner::new(&path)?;
+        Commands::Scan { path, json, verbose, interactive, git, staged } => {
+            let scanner = if git || staged {
+                if !git::is_git_repo(&path) {
+                    eprintln!("Error: Not a git repository");
+                    std::process::exit(1);
+                }
+                
+                let files = if staged {
+                    git::get_staged_files(&path)?
+                } else {
+                    git::get_changed_files(&path)?
+                };
+
+                if files.is_empty() {
+                    println!("No changed files to scan");
+                    return Ok(());
+                }
+
+                Scanner::new_with_files(&path, files)?
+            } else {
+                Scanner::new(&path)?
+            };
+
             let report = scanner.scan(verbose)?;
 
             if interactive {

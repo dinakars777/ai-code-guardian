@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **Git integration** - Scan only changed or staged files for faster CI/CD
 - **Custom rules engine** - Define your own security patterns with `.guardian.rules.json`
 - **Severity scoring** - Numerical risk scores (0-100) for every vulnerability
 - **Watch mode** - Auto-scan on file changes during development
@@ -44,6 +45,12 @@ ai-guardian scan --interactive
 
 # Watch mode - auto-scan on file changes
 ai-guardian watch
+
+# Scan only git changed files
+ai-guardian scan --git
+
+# Scan only git staged files
+ai-guardian scan --staged
 
 # Scan with JSON output
 ai-guardian scan --json

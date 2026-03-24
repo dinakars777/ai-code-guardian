@@ -10,6 +10,7 @@ use crate::custom_rules::{load_custom_rules, CompiledRule};
 pub struct Scanner {
     root_path: String,
     custom_rules: Vec<CompiledRule>,
+    specific_files: Option<Vec<String>>,
 }
 
 impl Scanner {
@@ -21,30 +22,71 @@ impl Scanner {
 
         let custom_rules = load_custom_rules(Path::new(&root_path))?;
 
-        Ok(Self { root_path, custom_rules })
+        Ok(Self { 
+            root_path, 
+            custom_rules,
+            specific_files: None,
+        })
+    }
+
+    pub fn new_with_files(path: &str, files: Vec<String>) -> Result<Self> {
+        let root_path = fs::canonicalize(path)
+            .context("Failed to resolve path")?
+            .to_string_lossy()
+            .to_string();
+
+        let custom_rules = load_custom_rules(Path::new(&root_path))?;
+
+        Ok(Self { 
+            root_path, 
+            custom_rules,
+            specific_files: Some(files),
+        })
     }
 
     pub fn scan(&self, verbose: bool) -> Result<Report> {
         let mut issues = Vec::new();
         let mut files_scanned = 0;
 
-        for entry in WalkDir::new(&self.root_path)
-            .follow_links(false)
-            .into_iter()
-            .filter_map(|e| e.ok())
-        {
-            let path = entry.path();
+        if let Some(ref specific_files) = self.specific_files {
+            // Scan only specific files
+            for file in specific_files {
+                let path = Path::new(&self.root_path).join(file);
+                if !path.exists() || !path.is_file() {
+                    continue;
+                }
 
-            // Skip directories and non-text files
-            if !path.is_file() || !self.should_scan(path) {
-                continue;
+                if !self.should_scan(&path) {
+                    continue;
+                }
+
+                files_scanned += 1;
+
+                if let Ok(content) = fs::read_to_string(&path) {
+                    let file_issues = self.scan_file(&path, &content, verbose);
+                    issues.extend(file_issues);
+                }
             }
+        } else {
+            // Scan all files
+            for entry in WalkDir::new(&self.root_path)
+                .follow_links(false)
+                .into_iter()
+                .filter_map(|e| e.ok())
+            {
+                let path = entry.path();
 
-            files_scanned += 1;
+                // Skip directories and non-text files
+                if !path.is_file() || !self.should_scan(path) {
+                    continue;
+                }
 
-            if let Ok(content) = fs::read_to_string(path) {
-                let file_issues = self.scan_file(path, &content, verbose);
-                issues.extend(file_issues);
+                files_scanned += 1;
+
+                if let Ok(content) = fs::read_to_string(path) {
+                    let file_issues = self.scan_file(path, &content, verbose);
+                    issues.extend(file_issues);
+                }
             }
         }
 
