@@ -1,1 +1,21 @@
 /target
+Cargo.lock
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files
+test_*.js
+test_*.py
+test_*.rs
+
+# Internal docs - DO NOT COMMIT
+STRATEGY.md
+MARKETING.md
+LAUNCH*.md
+REDDIT*.md
+DEVTO*.md
+*_INTERNAL.md
+notes.md
+TODO_PRIVATE.md
