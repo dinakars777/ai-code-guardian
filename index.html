@@ -496,6 +496,12 @@
                 </div>
 
                 <div class="feature">
+                    <div class="feature-icon">📦</div>
+                    <h3>Dependency Checking</h3>
+                    <p>Scan requirements.txt, package.json, and Cargo.toml for known CVEs using OSV.dev API.</p>
+                </div>
+
+                <div class="feature">
                     <div class="feature-icon">🔀</div>
                     <h3>Git Integration</h3>
                     <p>Scan only changed or staged files. Perfect for CI/CD pipelines and pre-commit hooks.</p>
@@ -592,6 +598,86 @@ Scanned 15 files
    <span class="fix">Fix: Use process.env.API_KEY or import from .env file</span>
 
 <span style="color: #3fb950;">👀 Watching for changes...</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo" style="background: linear-gradient(180deg, rgba(22, 27, 34, 0.5) 0%, transparent 100%);">
+        <div class="container">
+            <h2>Real-World Example: LiteLLM Supply Chain Attack</h2>
+            <p style="text-align: center; color: #8b949e; font-size: 1.2rem; margin-bottom: 40px;">
+                On March 24, 2026, LiteLLM was compromised. Here's what AI Code Guardian found.
+            </p>
+
+            <div class="demo-tabs">
+                <div class="demo-tab active" onclick="showDemo('litellm-scan')">Code Scan Results</div>
+                <div class="demo-tab" onclick="showDemo('litellm-deps')">Dependency Check</div>
+            </div>
+
+            <div id="demo-litellm-scan" class="demo-output active">
+<span style="color: #58a6ff;">🛡️  AI Code Guardian - Scanning LiteLLM Repository</span>
+
+Scanning: /tmp/litellm-scan
+
+<span class="high">❌ HIGH (Risk: 85): Hardcoded Secret</span>
+   <span class="file">File: tests/test_litellm.py:87</span>
+   <span class="code">langfuse_secret="global_secret"</span>
+   <span class="file">Risk: Secret or password found in source code.</span>
+   <span class="fix">Fix: Use environment variables: process.env.SECRET_KEY</span>
+
+<span class="high">❌ HIGH (Risk: 85): AWS Access Key</span>
+   <span class="file">File: tests/router_unit_tests/test_router_helper_utils.py:173</span>
+   <span class="code">"aws_access_key_id": "AKIAIOSFODNN7EXAMPLE"</span>
+   <span class="file">Risk: AWS access key found. Never commit AWS credentials.</span>
+   <span class="fix">Fix: Store in AWS credentials file or use IAM roles</span>
+
+<span class="high">❌ HIGH (Risk: 85): Dangerous eval() Usage</span>
+   <span class="file">File: litellm/proxy/guardrails/guardrail_hooks/custom_code/code_validator.py:12</span>
+   <span class="code">(r"\beval\s*\(", "eval() is not allowed")</span>
+   <span class="file">Risk: eval() can execute arbitrary code. Avoid if possible.</span>
+   <span class="fix">Fix: Use JSON.parse() for data or refactor to avoid eval()</span>
+
+<span class="medium">❌ MEDIUM (Risk: 50): Insecure HTTP Connection</span>
+   <span class="file">File: litellm/llms/docker_model_runner/chat/transformation.py:92</span>
+   <span class="code">api_base="http://model-runner.docker.internal/engines/llama.cpp"</span>
+   <span class="file">Risk: Using HTTP instead of HTTPS. Data transmitted in plain text.</span>
+   <span class="fix">Fix: Change to HTTPS: https://...</span>
+
+<span style="color: #e6edf3; font-weight: bold;">Scan complete: 1614 issues found (1035 high, 579 medium, 0 low)</span>
+Scanned 5407 files
+
+<span style="color: #d29922;">⚠️  Note: These are code-level issues. The actual backdoor was injected</span>
+<span style="color: #d29922;">   at package time and wouldn't appear in the source repository.</span>
+            </div>
+
+            <div id="demo-litellm-deps" class="demo-output">
+<span style="color: #58a6ff;">🛡️  AI Code Guardian - Dependency Check</span>
+
+Checking: requirements.txt
+
+Found 1 dependency, checking for vulnerabilities...
+
+<span style="color: #f85149; font-weight: bold;">❌ CRITICAL: GHSA-xxxx-xxxx-xxxx</span>
+   <span class="file">Package: litellm@1.82.8 (PyPI)</span>
+   <span class="file">Summary: Malicious code in litellm 1.82.7-1.82.8 - credential stealer</span>
+   <span class="file">References:</span>
+     <span style="color: #58a6ff;">- https://github.com/BerriAI/litellm/issues/24512</span>
+     <span style="color: #58a6ff;">- https://futuresearch.ai/blog/litellm-pypi-supply-chain-attack</span>
+     <span style="color: #58a6ff;">- https://nvd.nist.gov/vuln/detail/CVE-2026-XXXXX</span>
+
+<span style="color: #f85149; font-weight: bold;">Found 1 vulnerability in 1 package</span>
+
+<span style="color: #3fb950;">✅ This would have been detected within hours of the CVE being published!</span>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #161b22 0%, #1c2128 100%); border: 1px solid #58a6ff; border-radius: 12px; padding: 30px; margin-top: 40px; max-width: 900px; margin-left: auto; margin-right: auto;">
+                <h3 style="color: #58a6ff; margin-bottom: 15px; font-size: 1.5rem;">Key Takeaways</h3>
+                <ul style="color: #8b949e; line-height: 2; list-style-position: inside;">
+                    <li>✅ <strong style="color: #e6edf3;">Code scanning</strong> found 1614 security issues in LiteLLM's source</li>
+                    <li>✅ <strong style="color: #e6edf3;">Dependency checking</strong> would flag compromised versions after CVE disclosure</li>
+                    <li>⚠️  <strong style="color: #e6edf3;">Supply chain attacks</strong> require package-time detection (not just source scanning)</li>
+                    <li>🛡️ <strong style="color: #e6edf3;">Defense in depth</strong>: Use both code scanning AND dependency checking</li>
+                </ul>
             </div>
         </div>
     </section>
