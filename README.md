@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **Severity scoring** - Numerical risk scores (0-100) for every vulnerability
 - **Watch mode** - Auto-scan on file changes during development
 - **Interactive TUI mode** - Navigate issues with arrow keys, mark false positives
 - **Auto-fix suggestions** - Don't just find issues, get actionable solutions
@@ -61,13 +62,13 @@ ai-guardian scan --json
 
 Scanning: ./src
 
-❌ HIGH: Hardcoded API Key
+❌ HIGH (Risk: 85): Hardcoded API Key
    File: src/api.rs:12
    Found: const API_KEY = "sk-1234567890abcdef"
    Risk: Exposed credentials in source code
    Fix: Use process.env.API_KEY or import from .env file
 
-❌ HIGH: SQL Injection Risk
+❌ HIGH (Risk: 85): SQL Injection Risk
    File: src/db.rs:45
    Found: query = "SELECT * FROM users WHERE id = " + user_id
    Risk: Unsanitized user input in SQL query

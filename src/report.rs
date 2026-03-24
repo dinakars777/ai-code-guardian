@@ -8,6 +8,16 @@ pub enum Severity {
     Low,
 }
 
+impl Severity {
+    pub fn score(&self) -> u8 {
+        match self {
+            Severity::High => 85,
+            Severity::Medium => 50,
+            Severity::Low => 20,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Issue {
     pub severity: Severity,
@@ -18,6 +28,7 @@ pub struct Issue {
     pub matched: String,
     pub description: String,
     pub fix_suggestion: Option<String>,
+    pub risk_score: u8,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -97,9 +108,10 @@ impl Report {
 
     fn print_issue(&self, issue: &Issue, severity_label: &str, color: Color) {
         println!(
-            "{} {}: {}",
+            "{} {} (Risk: {}): {}",
             "❌".color(color),
             severity_label.color(color).bold(),
+            issue.risk_score,
             issue.title.bold()
         );
         println!(
