@@ -1,0 +1,15 @@
+# AI Code Guardian ignore patterns
+# Lines starting with # are comments
+
+# Ignore test files
+*test*
+*spec*
+
+# Ignore vendor/third-party code
+vendor/
+third_party/
+
+# Ignore generated files
+*.generated.*
+*.min.js
+*.bundle.js

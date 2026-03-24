@@ -9,6 +9,7 @@ mod tui;
 mod watch;
 mod custom_rules;
 mod git;
+mod ignore;
 
 use scanner::Scanner;
 

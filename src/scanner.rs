@@ -6,11 +6,13 @@ use walkdir::WalkDir;
 use crate::patterns::PATTERNS;
 use crate::report::{Issue, Report, Severity};
 use crate::custom_rules::{load_custom_rules, CompiledRule};
+use crate::ignore::IgnorePatterns;
 
 pub struct Scanner {
     root_path: String,
     custom_rules: Vec<CompiledRule>,
     specific_files: Option<Vec<String>>,
+    ignore_patterns: IgnorePatterns,
 }
 
 impl Scanner {
@@ -21,11 +23,13 @@ impl Scanner {
             .to_string();
 
         let custom_rules = load_custom_rules(Path::new(&root_path))?;
+        let ignore_patterns = IgnorePatterns::load(Path::new(&root_path))?;
 
         Ok(Self { 
             root_path, 
             custom_rules,
             specific_files: None,
+            ignore_patterns,
         })
     }
 
@@ -36,11 +40,13 @@ impl Scanner {
             .to_string();
 
         let custom_rules = load_custom_rules(Path::new(&root_path))?;
+        let ignore_patterns = IgnorePatterns::load(Path::new(&root_path))?;
 
         Ok(Self { 
             root_path, 
             custom_rules,
             specific_files: Some(files),
+            ignore_patterns,
         })
     }
 
@@ -96,6 +102,12 @@ impl Scanner {
     fn should_scan(&self, path: &Path) -> bool {
         // Skip common directories
         let path_str = path.to_string_lossy();
+        
+        // Check ignore patterns
+        if self.ignore_patterns.should_ignore(&path_str) {
+            return false;
+        }
+        
         if path_str.contains("/node_modules/")
             || path_str.contains("/target/")
             || path_str.contains("/.git/")

@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **.guardianignore file** - Exclude files/patterns from scanning
 - **Git integration** - Scan only changed or staged files for faster CI/CD
 - **Custom rules engine** - Define your own security patterns with `.guardian.rules.json`
 - **Severity scoring** - Numerical risk scores (0-100) for every vulnerability
@@ -112,6 +113,20 @@ Create `.guardian.rules.json` in your project root:
     "fix_suggestion": "Never store credit card numbers in code"
   }
 ]
+```
+
+## Ignore Files
+
+Create `.guardianignore` to exclude files:
+
+```
+# Ignore test files
+*test*
+*spec*
+
+# Ignore vendor code
+vendor/
+third_party/
 ```
 
 ## How It Works
