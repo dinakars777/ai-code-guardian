@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Hardcoded Credit Card",
+    "description": "Credit card number found in source code",
+    "severity": "high",
+    "pattern": "\\b\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}\\b",
+    "fix_suggestion": "Never store credit card numbers in code. Use a payment processor API"
+  },
+  {
+    "title": "TODO Comment",
+    "description": "TODO comment found - may indicate incomplete code",
+    "severity": "low",
+    "pattern": "//\\s*TODO:",
+    "fix_suggestion": "Complete the TODO or create a ticket to track it"
+  },
+  {
+    "title": "Console.log in Production",
+    "description": "console.log found - should be removed for production",
+    "severity": "low",
+    "pattern": "console\\.log\\(",
+    "fix_suggestion": "Remove console.log or use a proper logging library"
+  }
+]

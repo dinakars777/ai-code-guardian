@@ -7,6 +7,7 @@ mod patterns;
 mod report;
 mod tui;
 mod watch;
+mod custom_rules;
 
 use scanner::Scanner;
 

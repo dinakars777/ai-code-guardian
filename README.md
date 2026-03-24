@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **Custom rules engine** - Define your own security patterns with `.guardian.rules.json`
 - **Severity scoring** - Numerical risk scores (0-100) for every vulnerability
 - **Watch mode** - Auto-scan on file changes during development
 - **Interactive TUI mode** - Navigate issues with arrow keys, mark false positives
@@ -88,6 +89,22 @@ if [ $? -ne 0 ]; then
     echo "Security issues found. Commit blocked."
     exit 1
 fi
+```
+
+## Custom Rules
+
+Create `.guardian.rules.json` in your project root:
+
+```json
+[
+  {
+    "title": "Hardcoded Credit Card",
+    "description": "Credit card number found in source code",
+    "severity": "high",
+    "pattern": "\\b\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}\\b",
+    "fix_suggestion": "Never store credit card numbers in code"
+  }
+]
 ```
 
 ## How It Works

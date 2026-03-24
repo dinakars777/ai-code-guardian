@@ -5,9 +5,11 @@ use walkdir::WalkDir;
 
 use crate::patterns::PATTERNS;
 use crate::report::{Issue, Report, Severity};
+use crate::custom_rules::{load_custom_rules, CompiledRule};
 
 pub struct Scanner {
     root_path: String,
+    custom_rules: Vec<CompiledRule>,
 }
 
 impl Scanner {
@@ -17,7 +19,9 @@ impl Scanner {
             .to_string_lossy()
             .to_string();
 
-        Ok(Self { root_path })
+        let custom_rules = load_custom_rules(Path::new(&root_path))?;
+
+        Ok(Self { root_path, custom_rules })
     }
 
     pub fn scan(&self, verbose: bool) -> Result<Report> {
@@ -81,6 +85,7 @@ impl Scanner {
             .to_string_lossy()
             .to_string();
 
+        // Scan with built-in patterns
         for pattern in PATTERNS.iter() {
             // Skip low severity if not verbose
             if !verbose && pattern.severity == Severity::Low {
@@ -101,6 +106,31 @@ impl Scanner {
                         description: pattern.description.to_string(),
                         fix_suggestion: Some(pattern.fix_suggestion.to_string()),
                         risk_score: pattern.severity.score(),
+                    });
+                }
+            }
+        }
+
+        // Scan with custom rules
+        for rule in &self.custom_rules {
+            if !verbose && rule.severity == Severity::Low {
+                continue;
+            }
+
+            for (line_num, line) in content.lines().enumerate() {
+                if let Some(captures) = rule.regex.captures(line) {
+                    let matched = captures.get(0).map(|m| m.as_str()).unwrap_or("");
+
+                    issues.push(Issue {
+                        severity: rule.severity.clone(),
+                        title: rule.title.clone(),
+                        file: relative_path.clone(),
+                        line: line_num + 1,
+                        code: line.trim().to_string(),
+                        matched: matched.to_string(),
+                        description: rule.description.clone(),
+                        fix_suggestion: Some(rule.fix_suggestion.clone()),
+                        risk_score: rule.severity.score(),
                     });
                 }
             }
