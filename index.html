@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Guardian - Security Scanner for AI-Generated Code</title>
+    <meta name="description" content="Catch security vulnerabilities in AI-generated code before you commit. Fast, free, and open source.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background: #0d1117;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 60px 0 40px;
+            text-align: center;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #58a6ff;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: #8b949e;
+            margin-bottom: 40px;
+        }
+
+        .install-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 40px auto;
+            max-width: 600px;
+        }
+
+        .install-box code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #79c0ff;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #238636;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2ea043;
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+
+        .btn-secondary:hover {
+            background: #30363d;
+        }
+
+        .features {
+            padding: 80px 0;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #58a6ff;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 30px;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #e6edf3;
+        }
+
+        .feature p {
+            color: #8b949e;
+        }
+
+        .demo {
+            padding: 80px 0;
+            background: #161b22;
+        }
+
+        .demo h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: #58a6ff;
+        }
+
+        .demo-output {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 30px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-output .high {
+            color: #f85149;
+        }
+
+        .demo-output .medium {
+            color: #d29922;
+        }
+
+        .demo-output .file {
+            color: #8b949e;
+        }
+
+        .demo-output .code {
+            color: #79c0ff;
+        }
+
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        footer a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">🛡️</div>
+            <h1>AI Code Guardian</h1>
+            <p class="tagline">Security scanner for AI-generated code</p>
+            
+            <div class="install-box">
+                <code>cargo install ai-code-guardian</code>
+            </div>
+
+            <div class="buttons">
+                <a href="https://github.com/dinakars777/ai-code-guardian" class="btn btn-primary">View on GitHub</a>
+                <a href="https://crates.io/crates/ai-code-guardian" class="btn btn-secondary">View on Crates.io</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2>What It Detects</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="feature-icon">🔑</div>
+                    <h3>Hardcoded Secrets</h3>
+                    <p>API keys, passwords, tokens, and credentials exposed in source code</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">💉</div>
+                    <h3>SQL Injection</h3>
+                    <p>Unsafe query construction with string concatenation</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔓</div>
+                    <h3>Insecure HTTP</h3>
+                    <p>Unencrypted connections transmitting data in plain text</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">☁️</div>
+                    <h3>AWS Credentials</h3>
+                    <p>Exposed AWS access keys and secrets</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🗄️</div>
+                    <h3>Database URLs</h3>
+                    <p>Connection strings with embedded credentials</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">⚠️</div>
+                    <h3>Dangerous Code</h3>
+                    <p>eval() usage and other risky patterns</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo">
+        <div class="container">
+            <h2>Example Output</h2>
+            <div class="demo-output">
+<span style="color: #58a6ff;">🛡️  AI Code Guardian - Security Scan</span>
+
+Scanning: ./src
+
+<span class="high">❌ HIGH: Hardcoded API Key</span>
+   <span class="file">File: api.js:12</span>
+   <span class="file">Code:</span> <span class="code">const API_KEY = "sk-1234567890abcdef"</span>
+   <span class="file">Risk: API key found in source code. Store in environment variables instead.</span>
+
+<span class="high">❌ HIGH: SQL Injection Risk</span>
+   <span class="file">File: db.js:45</span>
+   <span class="file">Code:</span> <span class="code">query = "SELECT * FROM users WHERE id = " + userId</span>
+   <span class="file">Risk: String concatenation in SQL query. Use parameterized queries.</span>
+
+<span class="medium">❌ MEDIUM: Insecure HTTP Connection</span>
+   <span class="file">File: api.js:8</span>
+   <span class="file">Code:</span> <span class="code">fetch("http://api.example.com/data")</span>
+   <span class="file">Risk: Using HTTP instead of HTTPS. Data transmitted in plain text.</span>
+
+<span style="color: #e6edf3; font-weight: bold;">Scan complete: 3 issues found (2 high, 1 medium, 0 low)</span>
+Scanned 15 files
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2>Why AI Code Guardian?</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Written in Rust. Scans entire codebases in seconds.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Zero Config</h3>
+                    <p>Works out of the box. No setup required.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Local</h3>
+                    <p>No data leaves your machine. Complete privacy.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🆓</div>
+                    <h3>Free & Open Source</h3>
+                    <p>MIT licensed. Use it anywhere, modify as needed.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Beautiful Output</h3>
+                    <p>Color-coded, easy to read results.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>CI/CD Ready</h3>
+                    <p>Integrates with pre-commit hooks and pipelines.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built with ❤️ by <a href="https://github.com/dinakars777">Dinakar Sarbada</a></p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/dinakars777/ai-code-guardian">GitHub</a> • 
+                <a href="https://crates.io/crates/ai-code-guardian">Crates.io</a> • 
+                <a href="https://github.com/dinakars777/ai-code-guardian/issues">Report Issue</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
