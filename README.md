@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **Watch mode** - Auto-scan on file changes during development
 - **Interactive TUI mode** - Navigate issues with arrow keys, mark false positives
 - **Auto-fix suggestions** - Don't just find issues, get actionable solutions
 - **Lightning fast** - Written in Rust, 10x faster than Node.js alternatives
@@ -38,6 +39,9 @@ ai-guardian scan ./src
 
 # Interactive TUI mode
 ai-guardian scan --interactive
+
+# Watch mode - auto-scan on file changes
+ai-guardian watch
 
 # Scan with JSON output
 ai-guardian scan --json

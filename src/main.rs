@@ -6,6 +6,7 @@ mod scanner;
 mod patterns;
 mod report;
 mod tui;
+mod watch;
 
 use scanner::Scanner;
 
@@ -15,6 +16,8 @@ use scanner::Scanner;
 #[command(after_help = "EXAMPLES:\n  \
     ai-guardian scan              # Scan current directory\n  \
     ai-guardian scan ./src        # Scan specific directory\n  \
+    ai-guardian scan --interactive # Interactive TUI mode\n  \
+    ai-guardian watch             # Watch for changes\n  \
     ai-guardian scan --json       # Output as JSON")]
 struct Cli {
     #[command(subcommand)]
@@ -40,6 +43,17 @@ enum Commands {
         /// Interactive TUI mode
         #[arg(short, long)]
         interactive: bool,
+    },
+    
+    /// Watch directory for changes and scan automatically
+    Watch {
+        /// Directory to watch (default: current directory)
+        #[arg(default_value = ".")]
+        path: String,
+
+        /// Show all issues including low severity
+        #[arg(short, long)]
+        verbose: bool,
     },
 }
 
@@ -74,6 +88,9 @@ fn main() -> Result<()> {
                     std::process::exit(1);
                 }
             }
+        }
+        Commands::Watch { path, verbose } => {
+            watch::watch_directory(&path, verbose)?;
         }
     }
 
