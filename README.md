@@ -140,10 +140,10 @@ No data leaves your machine. Everything runs locally.
 
 ## Roadmap
 
-- [ ] XSS detection
+- [ ] Auto-fix command to apply fixes automatically
+- [ ] XSS detection patterns
 - [ ] Path traversal detection
-- [ ] Custom rule engine
-- [ ] CI/CD integration
+- [ ] CI/CD GitHub Action
 - [ ] VS Code extension
 
 ## Contributing
