@@ -17,6 +17,7 @@
             line-height: 1.6;
             color: #e6edf3;
             background: #0d1117;
+            overflow-x: hidden;
         }
 
         .container {
@@ -25,42 +26,113 @@
             padding: 0 20px;
         }
 
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
         header {
-            padding: 60px 0 40px;
+            padding: 80px 0 60px;
             text-align: center;
-            border-bottom: 1px solid #30363d;
+            position: relative;
         }
 
         .logo {
-            font-size: 4rem;
+            font-size: 5rem;
             margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 20px;
-            color: #58a6ff;
+            background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .tagline {
             font-size: 1.5rem;
             color: #8b949e;
             margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
         .install-box {
-            background: #161b22;
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
             border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 30px;
             margin: 40px auto;
             max-width: 600px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .install-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .install-box code {
             font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #79c0ff;
+            position: relative;
+            z-index: 1;
         }
 
         .buttons {
@@ -69,24 +141,52 @@
             justify-content: center;
             margin: 30px 0;
             flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
         }
 
         .btn {
-            padding: 12px 30px;
-            border-radius: 6px;
+            padding: 14px 32px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
         }
 
         .btn-primary {
-            background: #238636;
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
         }
 
         .btn-primary:hover {
-            background: #2ea043;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.6);
         }
 
         .btn-secondary {
@@ -97,6 +197,35 @@
 
         .btn-secondary:hover {
             background: #30363d;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 60px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.8s both;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #8b949e;
+            font-size: 1rem;
+            margin-top: 5px;
         }
 
         .features {
@@ -113,19 +242,51 @@
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            gap: 30px;
         }
 
         .feature {
-            background: #161b22;
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
             border: 1px solid #30363d;
-            border-radius: 6px;
+            border-radius: 12px;
             padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #58a6ff, #79c0ff);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(88, 166, 255, 0.2);
+            border-color: #58a6ff;
+        }
+
+        .feature:hover::before {
+            transform: scaleX(1);
         }
 
         .feature-icon {
             font-size: 2.5rem;
             margin-bottom: 15px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .feature h3 {
@@ -140,7 +301,7 @@
 
         .demo {
             padding: 80px 0;
-            background: #161b22;
+            background: linear-gradient(180deg, transparent 0%, rgba(22, 27, 34, 0.5) 100%);
         }
 
         .demo h2 {
@@ -150,32 +311,83 @@
             color: #58a6ff;
         }
 
+        .demo-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .demo-tab {
+            padding: 10px 20px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-tab.active {
+            background: #58a6ff;
+            color: white;
+            border-color: #58a6ff;
+        }
+
+        .demo-tab:hover {
+            border-color: #58a6ff;
+        }
+
         .demo-output {
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 6px;
+            border-radius: 12px;
             padding: 30px;
             font-family: 'Monaco', 'Courier New', monospace;
             font-size: 0.9rem;
             overflow-x: auto;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: none;
         }
 
-        .demo-output .high {
-            color: #f85149;
+        .demo-output.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
         }
 
-        .demo-output .medium {
-            color: #d29922;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .demo-output .file {
+        .demo-output .high { color: #f85149; }
+        .demo-output .medium { color: #d29922; }
+        .demo-output .low { color: #58a6ff; }
+        .demo-output .file { color: #8b949e; }
+        .demo-output .code { color: #79c0ff; }
+        .demo-output .fix { color: #3fb950; font-weight: bold; }
+
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-section p {
+            font-size: 1.3rem;
             color: #8b949e;
-        }
-
-        .demo-output .code {
-            color: #79c0ff;
+            margin-bottom: 40px;
         }
 
         footer {
@@ -188,131 +400,65 @@
         footer a {
             color: #58a6ff;
             text-decoration: none;
+            transition: color 0.3s ease;
         }
 
         footer a:hover {
-            text-decoration: underline;
+            color: #79c0ff;
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-
-            .tagline {
-                font-size: 1.2rem;
-            }
-
-            .buttons {
-                flex-direction: column;
-                align-items: center;
-            }
+            h1 { font-size: 2.5rem; }
+            .tagline { font-size: 1.2rem; }
+            .logo { font-size: 4rem; }
+            .stats { gap: 30px; }
+            .stat-number { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-animation"></div>
+
     <header>
         <div class="container">
             <div class="logo">🛡️</div>
             <h1>AI Code Guardian</h1>
-            <p class="tagline">Security scanner for AI-generated code</p>
+            <p class="tagline">Catch security vulnerabilities before you commit</p>
             
             <div class="install-box">
                 <code>cargo install ai-code-guardian</code>
             </div>
 
             <div class="buttons">
-                <a href="https://github.com/dinakars777/ai-code-guardian" class="btn btn-primary">View on GitHub</a>
-                <a href="https://crates.io/crates/ai-code-guardian" class="btn btn-secondary">View on Crates.io</a>
+                <a href="https://github.com/dinakars777/ai-code-guardian" class="btn btn-primary">
+                    <span>View on GitHub</span>
+                </a>
+                <a href="https://crates.io/crates/ai-code-guardian" class="btn btn-secondary">
+                    <span>View on Crates.io</span>
+                </a>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Vulnerability Types</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">10x</div>
+                    <div class="stat-label">Faster than Node.js</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Local & Private</div>
+                </div>
             </div>
         </div>
     </header>
 
     <section class="features">
         <div class="container">
-            <h2>What It Detects</h2>
+            <h2>Powerful Features</h2>
             <div class="feature-grid">
-                <div class="feature">
-                    <div class="feature-icon">🔑</div>
-                    <h3>Hardcoded Secrets</h3>
-                    <p>API keys, passwords, tokens, and credentials exposed in source code</p>
-                </div>
-
-                <div class="feature">
-                    <div class="feature-icon">💉</div>
-                    <h3>SQL Injection</h3>
-                    <p>Unsafe query construction with string concatenation</p>
-                </div>
-
-                <div class="feature">
-                    <div class="feature-icon">🔓</div>
-                    <h3>Insecure HTTP</h3>
-                    <p>Unencrypted connections transmitting data in plain text</p>
-                </div>
-
-                <div class="feature">
-                    <div class="feature-icon">☁️</div>
-                    <h3>AWS Credentials</h3>
-                    <p>Exposed AWS access keys and secrets</p>
-                </div>
-
-                <div class="feature">
-                    <div class="feature-icon">🗄️</div>
-                    <h3>Database URLs</h3>
-                    <p>Connection strings with embedded credentials</p>
-                </div>
-
-                <div class="feature">
-                    <div class="feature-icon">⚠️</div>
-                    <h3>Dangerous Code</h3>
-                    <p>eval() usage and other risky patterns</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="demo">
-        <div class="container">
-            <h2>Example Output</h2>
-            <div class="demo-output">
-<span style="color: #58a6ff;">🛡️  AI Code Guardian - Security Scan</span>
-
-Scanning: ./src
-
-<span class="high">❌ HIGH: Hardcoded API Key</span>
-   <span class="file">File: api.js:12</span>
-   <span class="file">Code:</span> <span class="code">const API_KEY = "sk-1234567890abcdef"</span>
-   <span class="file">Risk: API key found in source code. Store in environment variables instead.</span>
-   <span style="color: #3fb950; font-weight: bold;">Fix: Use process.env.API_KEY or import from .env file</span>
-
-<span class="high">❌ HIGH: SQL Injection Risk</span>
-   <span class="file">File: db.js:45</span>
-   <span class="file">Code:</span> <span class="code">query = "SELECT * FROM users WHERE id = " + userId</span>
-   <span class="file">Risk: String concatenation in SQL query. Use parameterized queries.</span>
-   <span style="color: #3fb950; font-weight: bold;">Fix: Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])</span>
-
-<span class="medium">❌ MEDIUM: Insecure HTTP Connection</span>
-   <span class="file">File: api.js:8</span>
-   <span class="file">Code:</span> <span class="code">fetch("http://api.example.com/data")</span>
-   <span class="file">Risk: Using HTTP instead of HTTPS. Data transmitted in plain text.</span>
-   <span style="color: #3fb950; font-weight: bold;">Fix: Change to HTTPS: https://...</span>
-
-<span style="color: #e6edf3; font-weight: bold;">Scan complete: 3 issues found (2 high, 1 medium, 0 low)</span>
-Scanned 15 files
-            </div>
-        </div>
-    </section>
-
-    <section class="features">
-        <div class="container">
-            <h2>Why AI Code Guardian?</h2>
-            <div class="feature-grid">
-                <div class="feature">
-                    <div class="feature-icon">💡</div>
-                    <h3>Auto-Fix Suggestions</h3>
-                    <p>Don't just find issues - get actionable fixes. Every vulnerability includes a specific solution.</p>
-                </div>
-
                 <div class="feature">
                     <div class="feature-icon">⚡</div>
                     <h3>Lightning Fast</h3>
@@ -320,28 +466,144 @@ Scanned 15 files
                 </div>
 
                 <div class="feature">
-                    <div class="feature-icon">📦</div>
-                    <h3>Single Binary</h3>
-                    <p>No npm, no node_modules, no dependencies. Just one executable.</p>
+                    <div class="feature-icon">🎯</div>
+                    <h3>Interactive TUI</h3>
+                    <p>Navigate issues with arrow keys, mark false positives, and view detailed information in a beautiful terminal UI.</p>
                 </div>
 
                 <div class="feature">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Zero Config</h3>
-                    <p>Works out of the box. No setup required.</p>
+                    <div class="feature-icon">👀</div>
+                    <h3>Watch Mode</h3>
+                    <p>Auto-scan on file changes during development. Catch issues as you code.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Auto-Fix Suggestions</h3>
+                    <p>Every vulnerability includes actionable fix suggestions. Don't just find issues, solve them.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Risk Scoring</h3>
+                    <p>Numerical risk scores (0-100) for every vulnerability. Prioritize what matters most.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Custom Rules</h3>
+                    <p>Define your own security patterns with .guardian.rules.json. Extend the scanner to your needs.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔀</div>
+                    <h3>Git Integration</h3>
+                    <p>Scan only changed or staged files. Perfect for CI/CD pipelines and pre-commit hooks.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🚫</div>
+                    <h3>.guardianignore</h3>
+                    <p>Exclude files and patterns from scanning. Full control over what gets scanned.</p>
                 </div>
 
                 <div class="feature">
                     <div class="feature-icon">🔒</div>
                     <h3>100% Local</h3>
-                    <p>No data leaves your machine. Complete privacy.</p>
+                    <p>No data leaves your machine. Complete privacy. No API calls, no telemetry.</p>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="feature">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Beautiful Output</h3>
-                    <p>Color-coded, easy to read results with clear explanations.</p>
-                </div>
+    <section class="demo">
+        <div class="container">
+            <h2>See It In Action</h2>
+            
+            <div class="demo-tabs">
+                <div class="demo-tab active" onclick="showDemo('scan')">Basic Scan</div>
+                <div class="demo-tab" onclick="showDemo('interactive')">Interactive Mode</div>
+                <div class="demo-tab" onclick="showDemo('watch')">Watch Mode</div>
+            </div>
+
+            <div id="demo-scan" class="demo-output active">
+<span style="color: #58a6ff;">🛡️  AI Code Guardian - Security Scan</span>
+
+Scanning: ./src
+
+<span class="high">❌ HIGH (Risk: 85): Hardcoded API Key</span>
+   <span class="file">File: api.js:12</span>
+   <span class="file">Code:</span> <span class="code">const API_KEY = "sk-1234567890abcdef"</span>
+   <span class="file">Risk: API key found in source code. Store in environment variables instead.</span>
+   <span class="fix">Fix: Use process.env.API_KEY or import from .env file</span>
+
+<span class="high">❌ HIGH (Risk: 85): SQL Injection Risk</span>
+   <span class="file">File: db.js:45</span>
+   <span class="file">Code:</span> <span class="code">query = "SELECT * FROM users WHERE id = " + userId</span>
+   <span class="file">Risk: String concatenation in SQL query. Use parameterized queries.</span>
+   <span class="fix">Fix: Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])</span>
+
+<span class="medium">❌ MEDIUM (Risk: 50): Insecure HTTP Connection</span>
+   <span class="file">File: api.js:8</span>
+   <span class="file">Code:</span> <span class="code">fetch("http://api.example.com/data")</span>
+   <span class="file">Risk: Using HTTP instead of HTTPS. Data transmitted in plain text.</span>
+   <span class="fix">Fix: Change to HTTPS: https://...</span>
+
+<span style="color: #e6edf3; font-weight: bold;">Scan complete: 3 issues found (2 high, 1 medium, 0 low)</span>
+Scanned 15 files
+            </div>
+
+            <div id="demo-interactive" class="demo-output">
+<span style="color: #58a6ff;">🛡️  AI Code Guardian - Interactive Mode</span>
+
+┌─ Issues ────────────────────────────────────────────────┐
+│ <span style="background: #30363d;">  HIGH - Hardcoded API Key - api.js:12              </span> │
+│   HIGH - SQL Injection Risk - db.js:45                 │
+│   MEDIUM - Insecure HTTP Connection - api.js:8         │
+└─────────────────────────────────────────────────────────┘
+
+┌─ Details ───────────────────────────────────────────────┐
+│ File: api.js:12                                         │
+│ Code: const API_KEY = "sk-1234567890abcdef"            │
+│ Risk: API key found in source code                     │
+│ <span class="fix">Fix: Use process.env.API_KEY or import from .env</span>     │
+└─────────────────────────────────────────────────────────┘
+
+<span class="file">↑/k: Up | ↓/j: Down | f: Mark False Positive | q: Quit</span>
+            </div>
+
+            <div id="demo-watch" class="demo-output">
+<span style="color: #58a6ff;">🛡️  AI Code Guardian - Watch Mode</span>
+
+Watching: ./src
+Press Ctrl+C to stop
+
+<span class="file">Running initial scan...</span>
+✅ No security issues found!
+Scanned 15 files
+
+<span style="color: #3fb950;">👀 Watching for changes...</span>
+
+<span style="color: #d29922;">📝 File changed, rescanning...</span>
+
+<span class="high">❌ HIGH (Risk: 85): Hardcoded API Key</span>
+   <span class="file">File: api.js:12</span>
+   <span class="file">Code:</span> <span class="code">const API_KEY = "sk-1234567890abcdef"</span>
+   <span class="fix">Fix: Use process.env.API_KEY or import from .env file</span>
+
+<span style="color: #3fb950;">👀 Watching for changes...</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Secure Your Code?</h2>
+            <p>Install in seconds. Start scanning immediately.</p>
+            <div class="buttons">
+                <a href="https://github.com/dinakars777/ai-code-guardian" class="btn btn-primary">
+                    <span>Get Started →</span>
+                </a>
             </div>
         </div>
     </section>
@@ -356,5 +618,36 @@ Scanned 15 files
             </p>
         </div>
     </footer>
+
+    <script>
+        function showDemo(type) {
+            document.querySelectorAll('.demo-output').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.demo-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            document.getElementById('demo-' + type).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out both';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>
