@@ -1,6 +1,6 @@
 [package]
 name = "ai-code-guardian"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Dinakar Sarbada <dinakars777@gmail.com>"]
 description = "Security scanner for AI-generated code - detects vulnerabilities before you commit"
@@ -22,3 +22,5 @@ colored = "2.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 lazy_static = "1.5"
+crossterm = "0.27"
+ratatui = "0.26"

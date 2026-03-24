@@ -5,6 +5,7 @@ use colored::*;
 mod scanner;
 mod patterns;
 mod report;
+mod tui;
 
 use scanner::Scanner;
 
@@ -35,6 +36,10 @@ enum Commands {
         /// Show all issues including low severity
         #[arg(short, long)]
         verbose: bool,
+
+        /// Interactive TUI mode
+        #[arg(short, long)]
+        interactive: bool,
     },
 }
 
@@ -42,26 +47,32 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Scan { path, json, verbose } => {
-            if !json {
-                println!("{}", "🛡️  AI Code Guardian - Security Scan".cyan().bold());
-                println!();
-                println!("Scanning: {}", path.yellow());
-                println!();
-            }
-
+        Commands::Scan { path, json, verbose, interactive } => {
             let scanner = Scanner::new(&path)?;
             let report = scanner.scan(verbose)?;
 
-            if json {
+            if interactive {
+                let has_high_risk = report.has_high_risk_issues();
+                tui::run_tui(report)?;
+                if has_high_risk {
+                    std::process::exit(1);
+                }
+            } else if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
+                if report.has_high_risk_issues() {
+                    std::process::exit(1);
+                }
             } else {
+                if !json {
+                    println!("{}", "🛡️  AI Code Guardian - Security Scan".cyan().bold());
+                    println!();
+                    println!("Scanning: {}", path.yellow());
+                    println!();
+                }
                 report.print();
-            }
-
-            // Exit with error code if high-risk issues found
-            if report.has_high_risk_issues() {
-                std::process::exit(1);
+                if report.has_high_risk_issues() {
+                    std::process::exit(1);
+                }
             }
         }
     }

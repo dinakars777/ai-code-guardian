@@ -14,6 +14,7 @@ This tool scans your code and catches these issues instantly.
 
 ## What Makes Us Different
 
+- **Interactive TUI mode** - Navigate issues with arrow keys, mark false positives
 - **Auto-fix suggestions** - Don't just find issues, get actionable solutions
 - **Lightning fast** - Written in Rust, 10x faster than Node.js alternatives
 - **Single binary** - No npm, no node_modules, just one executable
@@ -34,6 +35,9 @@ ai-guardian scan
 
 # Scan specific directory
 ai-guardian scan ./src
+
+# Interactive TUI mode
+ai-guardian scan --interactive
 
 # Scan with JSON output
 ai-guardian scan --json

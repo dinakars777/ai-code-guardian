@@ -8,7 +8,7 @@ pub enum Severity {
     Low,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Issue {
     pub severity: Severity,
     pub title: String,
@@ -20,7 +20,7 @@ pub struct Issue {
     pub fix_suggestion: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Report {
     pub issues: Vec<Issue>,
     pub files_scanned: usize,
