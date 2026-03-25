@@ -151,6 +151,16 @@ impl Scanner {
                 if let Some(captures) = pattern.regex.captures(line) {
                     let matched = captures.get(0).map(|m| m.as_str()).unwrap_or("");
 
+                    // Filter out safe HTTP URLs
+                    if pattern.title == "Insecure HTTP Connection" && self.is_safe_http_url(matched) {
+                        continue;
+                    }
+
+                    // Filter out safe IP addresses
+                    if pattern.title == "Hardcoded IP Address" && self.is_safe_ip(matched) {
+                        continue;
+                    }
+
                     issues.push(Issue {
                         severity: pattern.severity.clone(),
                         title: pattern.title.to_string(),
@@ -190,5 +200,35 @@ impl Scanner {
         }
 
         issues
+    }
+
+    fn is_safe_http_url(&self, url: &str) -> bool {
+        // Exclude localhost, 127.0.0.1, 0.0.0.0, example.com, and XML schemas
+        url.contains("localhost")
+            || url.contains("127.0.0.1")
+            || url.contains("0.0.0.0")
+            || url.contains("example.com")
+            || url.contains("schemas.")
+    }
+
+    fn is_safe_ip(&self, ip: &str) -> bool {
+        // Exclude localhost, 0.0.0.0, 255.255.255.x, and private ranges
+        ip == "127.0.0.1"
+            || ip == "0.0.0.0"
+            || ip.starts_with("255.255.255.")
+            || ip.starts_with("10.")
+            || ip.starts_with("192.168.")
+            || (ip.starts_with("172.") && {
+                // Check if it's in 172.16.0.0 - 172.31.255.255 range
+                if let Some(second_octet) = ip.split('.').nth(1) {
+                    if let Ok(num) = second_octet.parse::<u8>() {
+                        num >= 16 && num <= 31
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            })
     }
 }

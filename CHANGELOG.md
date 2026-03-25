@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.11.2] - 2026-03-25
+
+### Fixed
+- **CRITICAL**: Fixed regex syntax error - Rust regex crate doesn't support negative lookahead `(?!...)`
+- Rewrote HTTP URL pattern to use simple regex with post-match filtering
+- Rewrote hardcoded IP pattern to use simple regex with post-match filtering
+- Added `is_safe_http_url()` to exclude localhost, 127.0.0.1, 0.0.0.0, example.com, and XML schemas
+- Added `is_safe_ip()` to exclude localhost, private IP ranges (10.x, 192.168.x, 172.16-31.x), and subnet masks
+
+### Note
+- v0.11.0 and v0.11.1 will crash on any scan due to unsupported regex syntax - please upgrade to v0.11.2
+
 ## [0.11.1] - 2026-03-25
 
 ### Performance

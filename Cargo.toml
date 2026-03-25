@@ -1,6 +1,6 @@
 [package]
 name = "ai-code-guardian"
-version = "0.11.1"
+version = "0.11.2"
 edition = "2021"
 authors = ["Dinakar Sarbada <dinakars777@gmail.com>"]
 description = "Security scanner for AI-generated code - detects vulnerabilities before you commit"
