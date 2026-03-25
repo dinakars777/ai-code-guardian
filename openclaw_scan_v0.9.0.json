@@ -1,7 +1,0 @@
-error: unexpected argument '--format' found
-
-  tip: to pass '--format' as a value, use '-- --format'
-
-Usage: ai-guardian scan <PATH>
-
-For more information, try '--help'.

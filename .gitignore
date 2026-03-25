@@ -20,3 +20,7 @@ DEVTO*.md
 SETUP_FOR_*.md
 notes.md
 TODO_PRIVATE.md
+
+# Scan output files
+*_scan_*.json
+scan_results*.json

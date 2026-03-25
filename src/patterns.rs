@@ -61,25 +61,25 @@ lazy_static::lazy_static! {
             title: "Insecure HTTP Connection",
             description: "Using HTTP instead of HTTPS. Data transmitted in plain text.",
             severity: Severity::Medium,
-            regex: Regex::new(r#"http://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}"#).unwrap(),
+            regex: Regex::new(r#"http://(?!localhost|127\.0\.0\.1|0\.0\.0\.0|example\.com|schemas\.)[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}"#).unwrap(),
             fix_suggestion: "Change to HTTPS: https://...",
         },
         
-        // Eval usage
+        // Eval usage - only in JS/Python contexts
         Pattern {
             title: "Dangerous eval() Usage",
             description: "eval() can execute arbitrary code. Avoid if possible.",
             severity: Severity::High,
-            regex: Regex::new(r"\beval\s*\(").unwrap(),
+            regex: Regex::new(r"(?:^|[^a-zA-Z0-9_])eval\s*\(").unwrap(),
             fix_suggestion: "Use JSON.parse() for data or refactor to avoid eval()",
         },
         
-        // Hardcoded IPs
+        // Hardcoded IPs - exclude common safe IPs
         Pattern {
             title: "Hardcoded IP Address",
             description: "IP address in source code. Use configuration files.",
             severity: Severity::Low,
-            regex: Regex::new(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b").unwrap(),
+            regex: Regex::new(r"\b(?!127\.0\.0\.1|0\.0\.0\.0|255\.255\.255\.)(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b").unwrap(),
             fix_suggestion: "Move to config file or environment variable",
         },
         

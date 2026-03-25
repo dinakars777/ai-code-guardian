@@ -38,6 +38,7 @@ struct OsvPackage {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct OsvResponse {
+    #[serde(default)]
     vulns: Vec<OsvVulnerability>,
 }
 
@@ -188,9 +189,7 @@ fn parse_pyproject_toml(file_path: &Path) -> Result<Vec<Dependency>> {
     Ok(deps)
 }
 
-pub async fn check_vulnerability(dep: &Dependency) -> Result<Vec<Vulnerability>> {
-    let client = reqwest::Client::new();
-    
+pub async fn check_vulnerability(client: &reqwest::Client, dep: &Dependency) -> Result<Vec<Vulnerability>> {
     let query = OsvQuery {
         package: OsvPackage {
             name: dep.name.clone(),

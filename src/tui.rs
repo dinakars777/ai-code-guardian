@@ -96,6 +96,14 @@ pub fn run_tui(report: Report) -> Result<()> {
         return Ok(());
     }
 
+    // Setup panic hook to restore terminal
+    let original_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |panic_info| {
+        let _ = disable_raw_mode();
+        let _ = execute!(io::stdout(), LeaveAlternateScreen, DisableMouseCapture);
+        original_hook(panic_info);
+    }));
+
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
@@ -123,6 +131,15 @@ pub fn run_tui(report: Report) -> Result<()> {
     println!("Total issues: {}", app.issues.len());
     println!("Marked as false positives: {}", app.marked_false_positives.len());
     println!("Real issues: {}", real_issues.len());
+
+    // Check if there are high-risk real issues
+    let has_high_risk = real_issues.iter().any(|issue| {
+        matches!(issue.severity, Severity::High)
+    });
+
+    if has_high_risk {
+        std::process::exit(1);
+    }
 
     Ok(())
 }
