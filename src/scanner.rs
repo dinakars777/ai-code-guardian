@@ -139,14 +139,15 @@ impl Scanner {
             .to_string_lossy()
             .to_string();
 
-        // Scan with built-in patterns
-        for pattern in PATTERNS.iter() {
-            // Skip low severity if not verbose
-            if !verbose && pattern.severity == Severity::Low {
-                continue;
-            }
+        // Iterate lines once and test all patterns per line (better cache locality)
+        for (line_num, line) in content.lines().enumerate() {
+            // Check built-in patterns
+            for pattern in PATTERNS.iter() {
+                // Skip low severity if not verbose
+                if !verbose && pattern.severity == Severity::Low {
+                    continue;
+                }
 
-            for (line_num, line) in content.lines().enumerate() {
                 if let Some(captures) = pattern.regex.captures(line) {
                     let matched = captures.get(0).map(|m| m.as_str()).unwrap_or("");
 
@@ -163,15 +164,13 @@ impl Scanner {
                     });
                 }
             }
-        }
 
-        // Scan with custom rules
-        for rule in &self.custom_rules {
-            if !verbose && rule.severity == Severity::Low {
-                continue;
-            }
+            // Check custom rules
+            for rule in &self.custom_rules {
+                if !verbose && rule.severity == Severity::Low {
+                    continue;
+                }
 
-            for (line_num, line) in content.lines().enumerate() {
                 if let Some(captures) = rule.regex.captures(line) {
                     let matched = captures.get(0).map(|m| m.as_str()).unwrap_or("");
 

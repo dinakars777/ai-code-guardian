@@ -109,23 +109,18 @@ fn main() -> Result<()> {
             let report = scanner.scan(verbose)?;
 
             if interactive {
-                let has_high_risk = report.has_high_risk_issues();
                 tui::run_tui(report)?;
-                if has_high_risk {
-                    std::process::exit(1);
-                }
+                // Exit code is handled inside run_tui based on real issues
             } else if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
                 if report.has_high_risk_issues() {
                     std::process::exit(1);
                 }
             } else {
-                if !json {
-                    println!("{}", "🛡️  AI Code Guardian - Security Scan".cyan().bold());
-                    println!();
-                    println!("Scanning: {}", path.yellow());
-                    println!();
-                }
+                println!("{}", "🛡️  AI Code Guardian - Security Scan".cyan().bold());
+                println!();
+                println!("Scanning: {}", path.yellow());
+                println!();
                 report.print();
                 if report.has_high_risk_issues() {
                     std::process::exit(1);

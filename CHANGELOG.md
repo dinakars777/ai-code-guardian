@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.1] - 2026-03-25
+
+### Performance
+- Inverted scan loop order - now iterates lines once and tests all patterns per line (better cache locality, O(lines × patterns) instead of O(patterns × lines))
+
+### Cleanup
+- Removed dead code in main.rs - stale has_high_risk variable and redundant if !json guard
+
 ## [0.11.0] - 2026-03-24
 
 ### Fixed
