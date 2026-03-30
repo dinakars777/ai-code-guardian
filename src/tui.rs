@@ -172,7 +172,7 @@ fn ui(f: &mut Frame, app: &mut App) {
             Constraint::Length(8),
             Constraint::Length(3),
         ])
-        .split(f.size());
+        .split(f.area());
 
     // Header
     let header = Paragraph::new("🛡️  AI Code Guardian - Interactive Mode")
