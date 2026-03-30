@@ -1,9 +1,10 @@
 use anyhow::Result;
+use globset::{Glob, GlobSet, GlobSetBuilder};
 use std::fs;
 use std::path::Path;
 
 pub struct IgnorePatterns {
-    patterns: Vec<String>,
+    glob_set: GlobSet,
 }
 
 impl IgnorePatterns {
@@ -12,37 +13,30 @@ impl IgnorePatterns {
         
         if !ignore_file.exists() {
             return Ok(Self {
-                patterns: Vec::new(),
+                glob_set: GlobSet::empty(),
             });
         }
 
         let content = fs::read_to_string(&ignore_file)?;
-        let patterns: Vec<String> = content
-            .lines()
-            .map(|line| line.trim())
-            .filter(|line| !line.is_empty() && !line.starts_with('#'))
-            .map(|line| line.to_string())
-            .collect();
+        let mut builder = GlobSetBuilder::new();
+        
+        for line in content.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            
+            // Add the glob pattern
+            if let Ok(glob) = Glob::new(line) {
+                builder.add(glob);
+            }
+        }
 
-        Ok(Self { patterns })
+        let glob_set = builder.build()?;
+        Ok(Self { glob_set })
     }
 
     pub fn should_ignore(&self, path: &str) -> bool {
-        for pattern in &self.patterns {
-            if path.contains(pattern) {
-                return true;
-            }
-            
-            // Simple glob matching for * wildcard
-            if pattern.contains('*') {
-                let parts: Vec<&str> = pattern.split('*').collect();
-                if parts.len() == 2 {
-                    if path.starts_with(parts[0]) && path.ends_with(parts[1]) {
-                        return true;
-                    }
-                }
-            }
-        }
-        false
+        self.glob_set.is_match(path)
     }
 }
