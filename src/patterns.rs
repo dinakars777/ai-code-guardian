@@ -56,6 +56,33 @@ lazy_static::lazy_static! {
             fix_suggestion: "Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])",
         },
         
+        // SQL Injection - Python f-strings
+        Pattern {
+            title: "SQL Injection Risk (f-string)",
+            description: "SQL query using Python f-string with variables. Use parameterized queries.",
+            severity: Severity::High,
+            regex: Regex::new(r#"(?i)f["'].*(?:SELECT|INSERT|UPDATE|DELETE).*\{[^}]+\}.*["']"#).unwrap(),
+            fix_suggestion: "Use parameterized queries: cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))",
+        },
+        
+        // SQL Injection - Template literals
+        Pattern {
+            title: "SQL Injection Risk (template literal)",
+            description: "SQL query using template literal with variables. Use parameterized queries.",
+            severity: Severity::High,
+            regex: Regex::new(r"(?i)`.*(?:SELECT|INSERT|UPDATE|DELETE).*\$\{[^}]+\}.*`").unwrap(),
+            fix_suggestion: "Use parameterized queries: db.query('SELECT * FROM users WHERE id = $1', [userId])",
+        },
+        
+        // SQL Injection - WHERE clause concatenation
+        Pattern {
+            title: "SQL Injection Risk (WHERE clause)",
+            description: "String concatenation in WHERE clause. Use parameterized queries.",
+            severity: Severity::High,
+            regex: Regex::new(r#"(?i)WHERE\s+\w+\s*=\s*['"]?\s*\+\s*\w+"#).unwrap(),
+            fix_suggestion: "Use parameterized queries instead of string concatenation",
+        },
+        
         // Insecure HTTP
         Pattern {
             title: "Insecure HTTP Connection",
