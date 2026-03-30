@@ -6,6 +6,7 @@ use std::sync::mpsc::channel;
 use std::time::Duration;
 
 use crate::scanner::Scanner;
+use crate::constants::SCANNABLE_EXTENSIONS;
 
 pub fn watch_directory(path: &str, verbose: bool) -> Result<()> {
     println!("{}", "🛡️  AI Code Guardian - Watch Mode".cyan().bold());
@@ -56,12 +57,7 @@ fn should_scan(event: &Event) -> bool {
     ) && event.paths.iter().any(|p| {
         if let Some(ext) = p.extension() {
             let ext = ext.to_string_lossy().to_lowercase();
-            matches!(
-                ext.as_str(),
-                "rs" | "js" | "ts" | "jsx" | "tsx" | "py" | "go" | "java" | "c" | "cpp" | "h"
-                    | "hpp" | "cs" | "php" | "rb" | "swift" | "kt" | "scala" | "sh" | "bash"
-                    | "env" | "yml" | "yaml" | "json" | "toml" | "sql"
-            )
+            SCANNABLE_EXTENSIONS.contains(&ext.as_str())
         } else {
             false
         }
