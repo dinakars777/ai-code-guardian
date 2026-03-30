@@ -7,6 +7,7 @@ use crate::patterns::PATTERNS;
 use crate::report::{Issue, Report, Severity};
 use crate::custom_rules::{load_custom_rules, CompiledRule};
 use crate::ignore::IgnorePatterns;
+use crate::constants::SCANNABLE_EXTENSIONS;
 
 pub struct Scanner {
     root_path: String,
@@ -120,12 +121,7 @@ impl Scanner {
         // Only scan text files
         if let Some(ext) = path.extension() {
             let ext = ext.to_string_lossy().to_lowercase();
-            matches!(
-                ext.as_str(),
-                "rs" | "js" | "ts" | "jsx" | "tsx" | "py" | "go" | "java" | "c" | "cpp" | "h"
-                    | "hpp" | "cs" | "php" | "rb" | "swift" | "kt" | "scala" | "sh" | "bash"
-                    | "env" | "yml" | "yaml" | "json" | "toml" | "sql"
-            )
+            SCANNABLE_EXTENSIONS.contains(&ext.as_str())
         } else {
             false
         }

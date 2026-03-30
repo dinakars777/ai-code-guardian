@@ -11,6 +11,7 @@ mod custom_rules;
 mod git;
 mod ignore;
 mod deps;
+mod constants;
 
 use scanner::Scanner;
 
