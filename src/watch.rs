@@ -34,9 +34,23 @@ pub fn watch_directory(path: &str, verbose: bool) -> Result<()> {
                     println!();
                     println!("{}", "📝 File changed, rescanning...".yellow());
                     println!();
-                    if let Err(e) = run_scan(path, verbose) {
-                        eprintln!("{}: {}", "Error".red(), e);
+                    
+                    // Scan only the changed files
+                    let changed_files: Vec<String> = event.paths.iter()
+                        .filter_map(|p| {
+                            p.strip_prefix(path)
+                                .ok()
+                                .and_then(|rel| rel.to_str())
+                                .map(|s| s.to_string())
+                        })
+                        .collect();
+                    
+                    if !changed_files.is_empty() {
+                        if let Err(e) = run_scan_files(path, &changed_files, verbose) {
+                            eprintln!("{}: {}", "Error".red(), e);
+                        }
                     }
+                    
                     println!();
                     println!("{}", "👀 Watching for changes...".green());
                     println!();
@@ -70,6 +84,13 @@ fn should_scan(event: &Event) -> bool {
 
 fn run_scan(path: &str, verbose: bool) -> Result<()> {
     let scanner = Scanner::new(path)?;
+    let report = scanner.scan(verbose)?;
+    report.print();
+    Ok(())
+}
+
+fn run_scan_files(path: &str, files: &[String], verbose: bool) -> Result<()> {
+    let scanner = Scanner::new_with_files(path, files.to_vec())?;
     let report = scanner.scan(verbose)?;
     report.print();
     Ok(())
