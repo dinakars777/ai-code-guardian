@@ -116,8 +116,37 @@ fn parse_package_json(file_path: &Path) -> Result<Vec<Dependency>> {
     let json: serde_json::Value = serde_json::from_str(&content)?;
     let mut deps = Vec::new();
 
+    // Check dependencies
     if let Some(dependencies) = json.get("dependencies").and_then(|d| d.as_object()) {
         for (name, version) in dependencies {
+            if let Some(ver) = version.as_str() {
+                let clean_ver = ver.trim_start_matches('^').trim_start_matches('~');
+                deps.push(Dependency {
+                    name: name.clone(),
+                    version: clean_ver.to_string(),
+                    ecosystem: "npm".to_string(),
+                });
+            }
+        }
+    }
+
+    // Check devDependencies
+    if let Some(dev_dependencies) = json.get("devDependencies").and_then(|d| d.as_object()) {
+        for (name, version) in dev_dependencies {
+            if let Some(ver) = version.as_str() {
+                let clean_ver = ver.trim_start_matches('^').trim_start_matches('~');
+                deps.push(Dependency {
+                    name: name.clone(),
+                    version: clean_ver.to_string(),
+                    ecosystem: "npm".to_string(),
+                });
+            }
+        }
+    }
+
+    // Check optionalDependencies
+    if let Some(optional_dependencies) = json.get("optionalDependencies").and_then(|d| d.as_object()) {
+        for (name, version) in optional_dependencies {
             if let Some(ver) = version.as_str() {
                 let clean_ver = ver.trim_start_matches('^').trim_start_matches('~');
                 deps.push(Dependency {
@@ -137,26 +166,44 @@ fn parse_cargo_toml(file_path: &Path) -> Result<Vec<Dependency>> {
     let toml: toml::Value = toml::from_str(&content)?;
     let mut deps = Vec::new();
 
-    if let Some(dependencies) = toml.get("dependencies").and_then(|d| d.as_table()) {
-        for (name, value) in dependencies {
-            let version = match value {
-                toml::Value::String(v) => v.clone(),
-                toml::Value::Table(t) => {
-                    if let Some(v) = t.get("version").and_then(|v| v.as_str()) {
-                        v.to_string()
-                    } else {
-                        continue;
+    // Helper function to parse dependency section
+    let parse_deps = |section: &toml::Value, deps: &mut Vec<Dependency>| {
+        if let Some(dependencies) = section.as_table() {
+            for (name, value) in dependencies {
+                let version = match value {
+                    toml::Value::String(v) => v.clone(),
+                    toml::Value::Table(t) => {
+                        if let Some(v) = t.get("version").and_then(|v| v.as_str()) {
+                            v.to_string()
+                        } else {
+                            continue;
+                        }
                     }
-                }
-                _ => continue,
-            };
+                    _ => continue,
+                };
 
-            deps.push(Dependency {
-                name: name.clone(),
-                version,
-                ecosystem: "crates.io".to_string(),
-            });
+                deps.push(Dependency {
+                    name: name.clone(),
+                    version,
+                    ecosystem: "crates.io".to_string(),
+                });
+            }
         }
+    };
+
+    // Check [dependencies]
+    if let Some(dependencies) = toml.get("dependencies") {
+        parse_deps(dependencies, &mut deps);
+    }
+
+    // Check [dev-dependencies]
+    if let Some(dev_dependencies) = toml.get("dev-dependencies") {
+        parse_deps(dev_dependencies, &mut deps);
+    }
+
+    // Check [build-dependencies]
+    if let Some(build_dependencies) = toml.get("build-dependencies") {
+        parse_deps(build_dependencies, &mut deps);
     }
 
     Ok(deps)
