@@ -131,16 +131,14 @@ fn main() -> Result<()> {
             watch::watch_directory(&path, verbose)?;
         }
         Commands::CheckDeps { path, json } => {
-            tokio::runtime::Runtime::new()?.block_on(async {
-                check_dependencies(&path, json).await
-            })?;
+            check_dependencies(&path, json)?;
         }
     }
 
     Ok(())
 }
 
-async fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
+fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
     use std::path::Path;
     
     let path = Path::new(file_path);
@@ -170,10 +168,10 @@ async fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
 
     let mut total_vulns = 0;
     let mut results = Vec::new();
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
 
     for dep in &dependencies {
-        let vulns = deps::check_vulnerability(&client, dep).await?;
+        let vulns = deps::check_vulnerability(&client, dep)?;
         
         if !vulns.is_empty() {
             total_vulns += vulns.len();
