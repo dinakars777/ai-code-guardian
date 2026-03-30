@@ -25,7 +25,7 @@ lazy_static = "1.5"
 crossterm = "0.27"
 ratatui = "0.26"
 notify = "6.1"
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "blocking"] }
 tokio = { version = "1.0", features = ["full"] }
 toml = "0.8"
 globset = "0.4"

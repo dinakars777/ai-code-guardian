@@ -189,7 +189,7 @@ fn parse_pyproject_toml(file_path: &Path) -> Result<Vec<Dependency>> {
     Ok(deps)
 }
 
-pub async fn check_vulnerability(client: &reqwest::Client, dep: &Dependency) -> Result<Vec<Vulnerability>> {
+pub fn check_vulnerability(client: &reqwest::blocking::Client, dep: &Dependency) -> Result<Vec<Vulnerability>> {
     let query = OsvQuery {
         package: OsvPackage {
             name: dep.name.clone(),
@@ -201,14 +201,13 @@ pub async fn check_vulnerability(client: &reqwest::Client, dep: &Dependency) -> 
     let response = client
         .post("https://api.osv.dev/v1/query")
         .json(&query)
-        .send()
-        .await?;
+        .send()?;
 
     if !response.status().is_success() {
         return Ok(Vec::new());
     }
 
-    let osv_response: OsvResponse = response.json().await?;
+    let osv_response: OsvResponse = response.json()?;
     
     let vulnerabilities = osv_response
         .vulns
