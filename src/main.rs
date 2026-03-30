@@ -171,7 +171,12 @@ fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
     let mut results = Vec::new();
     let client = reqwest::blocking::Client::new();
 
-    for dep in &dependencies {
+    for (idx, dep) in dependencies.iter().enumerate() {
+        // Add delay between requests to avoid rate limiting (except for first request)
+        if idx > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        }
+
         let vulns = deps::check_vulnerability(&client, dep)?;
         
         if !vulns.is_empty() {
