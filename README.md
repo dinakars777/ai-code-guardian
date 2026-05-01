@@ -16,7 +16,7 @@ Security scanner for AI-generated code. Catches vulnerabilities before you commi
 
 ## The Problem
 
-AI coding tools are great, but they introduce security risks:
+AI coding tools introduce security risks:
 - Hardcoded API keys and secrets
 - SQL injection vulnerabilities
 - Insecure HTTP requests
