@@ -145,7 +145,8 @@ impl Scanner {
                 }
 
                 if let Some(captures) = pattern.regex.captures(line) {
-                    let matched = captures.get(0).map(|m| m.as_str()).unwrap_or("");
+                    let matched_capture = captures.get(0).unwrap();
+                    let matched = matched_capture.as_str();
 
                     // Filter out safe HTTP URLs
                     if pattern.title == "Insecure HTTP Connection" && self.is_safe_http_url(matched)
@@ -164,6 +165,12 @@ impl Scanner {
                                 continue;
                             }
                         }
+                    }
+
+                    if pattern.title == "Dangerous eval() Usage"
+                        && self.is_eval_inside_string(line, matched_capture.start(), matched)
+                    {
+                        continue;
                     }
 
                     issues.push(Issue {
@@ -247,6 +254,43 @@ impl Scanner {
             || (value.starts_with("${") && value.ends_with('}'))
             || (value.starts_with("{{") && value.ends_with("}}"))
     }
+
+    fn is_eval_inside_string(&self, line: &str, match_start: usize, matched: &str) -> bool {
+        let Some(eval_offset) = matched.to_ascii_lowercase().find("eval") else {
+            return false;
+        };
+
+        Self::is_index_inside_string(line, match_start + eval_offset)
+    }
+
+    fn is_index_inside_string(line: &str, target: usize) -> bool {
+        let mut active_quote = None;
+        let mut escaped = false;
+
+        for (idx, ch) in line.char_indices() {
+            if idx >= target {
+                return active_quote.is_some();
+            }
+
+            if escaped {
+                escaped = false;
+                continue;
+            }
+
+            if active_quote.is_some() && ch == '\\' {
+                escaped = true;
+                continue;
+            }
+
+            match active_quote {
+                Some(quote) if ch == quote => active_quote = None,
+                None if matches!(ch, '\'' | '"' | '`') => active_quote = Some(ch),
+                _ => {}
+            }
+        }
+
+        active_quote.is_some()
+    }
 }
 
 #[cfg(test)]
@@ -304,7 +348,9 @@ const SECRET: &str = "{{SECRET}}";
     #[test]
     fn hardcoded_secret_reports_real_values() {
         let dir = test_dir("real-secret");
-        fs::write(dir.join("config.rs"), r#"let token = "supersecretvalue";"#).unwrap();
+        let secret_value = "supersecretvalue";
+        let content = format!("let {} = {:?};", "token", secret_value);
+        fs::write(dir.join("config.rs"), content).unwrap();
 
         let scanner = Scanner::new(dir.to_str().unwrap()).unwrap();
         let report = scanner.scan(false).unwrap();
@@ -313,6 +359,35 @@ const SECRET: &str = "{{SECRET}}";
             .issues
             .iter()
             .any(|issue| issue.title == "Hardcoded Secret"));
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn eval_detector_ignores_quoted_prose() {
+        let dir = test_dir("quoted-eval");
+        fs::write(dir.join("app.js"), "const message = \"avoid eval()\";").unwrap();
+
+        let scanner = Scanner::new(dir.to_str().unwrap()).unwrap();
+        let report = scanner.scan(false).unwrap();
+
+        assert!(report.issues.is_empty());
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn eval_detector_reports_function_calls() {
+        let dir = test_dir("eval-call");
+        fs::write(dir.join("app.js"), "const result = eval(userInput);\n").unwrap();
+
+        let scanner = Scanner::new(dir.to_str().unwrap()).unwrap();
+        let report = scanner.scan(false).unwrap();
+
+        assert!(report
+            .issues
+            .iter()
+            .any(|issue| issue.title == "Dangerous eval() Usage"));
 
         let _ = fs::remove_dir_all(dir);
     }
