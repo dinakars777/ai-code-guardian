@@ -10,7 +10,7 @@ pub struct IgnorePatterns {
 impl IgnorePatterns {
     pub fn load(root_path: &Path) -> Result<Self> {
         let ignore_file = root_path.join(".guardianignore");
-        
+
         if !ignore_file.exists() {
             return Ok(Self {
                 glob_set: GlobSet::empty(),
@@ -19,13 +19,13 @@ impl IgnorePatterns {
 
         let content = fs::read_to_string(&ignore_file)?;
         let mut builder = GlobSetBuilder::new();
-        
+
         for line in content.lines() {
             let line = line.trim();
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
-            
+
             // Add the glob pattern
             if let Ok(glob) = Glob::new(line) {
                 builder.add(glob);

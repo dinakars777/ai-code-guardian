@@ -19,7 +19,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"(?i)(api[_-]?key|apikey|api[_-]?secret)\s*[=:]\s*["']([a-zA-Z0-9_\-]{20,})["']"#).unwrap(),
             fix_suggestion: "Use process.env.API_KEY or import from .env file",
         },
-        
+
         // AWS Keys
         Pattern {
             title: "AWS Access Key",
@@ -28,7 +28,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r"AKIA[0-9A-Z]{16}").unwrap(),
             fix_suggestion: "Store in AWS credentials file or use IAM roles",
         },
-        
+
         // Private Keys
         Pattern {
             title: "Private Key",
@@ -37,7 +37,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r"-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----").unwrap(),
             fix_suggestion: "Store private keys in secure key management system (AWS KMS, HashiCorp Vault)",
         },
-        
+
         // Generic Secrets
         Pattern {
             title: "Hardcoded Secret",
@@ -46,7 +46,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"(?i)(password|passwd|pwd|secret|token)\s*[=:]\s*["']([^"'\s]{8,})["']"#).unwrap(),
             fix_suggestion: "Use environment variables: process.env.SECRET_KEY",
         },
-        
+
         // SQL Injection
         Pattern {
             title: "SQL Injection Risk",
@@ -55,7 +55,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"(?i)(?:SELECT|INSERT|UPDATE|DELETE)\s+(?:FROM|INTO|SET).*\+.*["']"#).unwrap(),
             fix_suggestion: "Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])",
         },
-        
+
         // SQL Injection - Python f-strings
         Pattern {
             title: "SQL Injection Risk (f-string)",
@@ -64,7 +64,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"(?i)f["'].*(?:SELECT|INSERT|UPDATE|DELETE).*\{[^}]+\}.*["']"#).unwrap(),
             fix_suggestion: "Use parameterized queries: cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))",
         },
-        
+
         // SQL Injection - Template literals
         Pattern {
             title: "SQL Injection Risk (template literal)",
@@ -73,7 +73,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r"(?i)`.*(?:SELECT|INSERT|UPDATE|DELETE).*\$\{[^}]+\}.*`").unwrap(),
             fix_suggestion: "Use parameterized queries: db.query('SELECT * FROM users WHERE id = $1', [userId])",
         },
-        
+
         // SQL Injection - WHERE clause concatenation
         Pattern {
             title: "SQL Injection Risk (WHERE clause)",
@@ -82,7 +82,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"(?i)WHERE\s+\w+\s*=\s*['"]?\s*\+\s*\w+"#).unwrap(),
             fix_suggestion: "Use parameterized queries instead of string concatenation",
         },
-        
+
         // Insecure HTTP
         Pattern {
             title: "Insecure HTTP Connection",
@@ -91,7 +91,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"http://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}"#).unwrap(),
             fix_suggestion: "Change to HTTPS: https://...",
         },
-        
+
         // Eval usage - only in JS/Python contexts
         Pattern {
             title: "Dangerous eval() Usage",
@@ -100,7 +100,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r"(?:^|[^a-zA-Z0-9_])eval\s*\(").unwrap(),
             fix_suggestion: "Use JSON.parse() for data or refactor to avoid eval()",
         },
-        
+
         // Hardcoded IPs - exclude common safe IPs
         Pattern {
             title: "Hardcoded IP Address",
@@ -109,7 +109,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b").unwrap(),
             fix_suggestion: "Move to config file or environment variable",
         },
-        
+
         // JWT Secrets
         Pattern {
             title: "Hardcoded JWT Secret",
@@ -118,7 +118,7 @@ lazy_static::lazy_static! {
             regex: Regex::new(r#"(?i)jwt[_-]?secret\s*[=:]\s*["']([^"'\s]{8,})["']"#).unwrap(),
             fix_suggestion: "Use process.env.JWT_SECRET with a strong random value",
         },
-        
+
         // Database URLs
         Pattern {
             title: "Database Connection String",

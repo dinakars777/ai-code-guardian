@@ -56,7 +56,8 @@ struct OsvReference {
 }
 
 pub fn parse_dependencies(file_path: &Path) -> Result<Vec<Dependency>> {
-    let filename = file_path.file_name()
+    let filename = file_path
+        .file_name()
         .and_then(|n| n.to_str())
         .context("Invalid filename")?;
 
@@ -102,8 +103,10 @@ fn parse_requirement_line(line: &str) -> Option<(&str, &str)> {
     for op in &["==", ">=", "<=", "~=", "!="] {
         if let Some(pos) = line.find(op) {
             let name = line[..pos].trim();
-            let version = line[pos + op.len()..].trim()
-                .split(',').next()? // Handle multiple constraints
+            let version = line[pos + op.len()..]
+                .trim()
+                .split(',')
+                .next()? // Handle multiple constraints
                 .trim();
             return Some((name, version));
         }
@@ -145,7 +148,9 @@ fn parse_package_json(file_path: &Path) -> Result<Vec<Dependency>> {
     }
 
     // Check optionalDependencies
-    if let Some(optional_dependencies) = json.get("optionalDependencies").and_then(|d| d.as_object()) {
+    if let Some(optional_dependencies) =
+        json.get("optionalDependencies").and_then(|d| d.as_object())
+    {
         for (name, version) in optional_dependencies {
             if let Some(ver) = version.as_str() {
                 let clean_ver = ver.trim_start_matches('^').trim_start_matches('~');
@@ -236,7 +241,10 @@ fn parse_pyproject_toml(file_path: &Path) -> Result<Vec<Dependency>> {
     Ok(deps)
 }
 
-pub fn check_vulnerability(client: &reqwest::blocking::Client, dep: &Dependency) -> Result<Vec<Vulnerability>> {
+pub fn check_vulnerability(
+    client: &reqwest::blocking::Client,
+    dep: &Dependency,
+) -> Result<Vec<Vulnerability>> {
     let query = OsvQuery {
         package: OsvPackage {
             name: dep.name.clone(),
@@ -255,18 +263,20 @@ pub fn check_vulnerability(client: &reqwest::blocking::Client, dep: &Dependency)
     }
 
     let osv_response: OsvResponse = response.json()?;
-    
+
     let vulnerabilities = osv_response
         .vulns
         .into_iter()
         .map(|v| {
-            let severity = v.database_specific
+            let severity = v
+                .database_specific
                 .as_ref()
                 .and_then(|db| db.get("severity"))
                 .and_then(|s| s.as_str())
                 .map(|s| s.to_string());
 
-            let references = v.references
+            let references = v
+                .references
                 .unwrap_or_default()
                 .into_iter()
                 .map(|r| Reference { url: r.url })
@@ -274,7 +284,9 @@ pub fn check_vulnerability(client: &reqwest::blocking::Client, dep: &Dependency)
 
             Vulnerability {
                 id: v.id,
-                summary: v.summary.unwrap_or_else(|| "No description available".to_string()),
+                summary: v
+                    .summary
+                    .unwrap_or_else(|| "No description available".to_string()),
                 severity,
                 references,
             }

@@ -26,8 +26,8 @@ impl Scanner {
         let custom_rules = load_custom_rules(Path::new(&root_path))?;
         let ignore_patterns = IgnorePatterns::load(Path::new(&root_path))?;
 
-        Ok(Self { 
-            root_path, 
+        Ok(Self {
+            root_path,
             custom_rules,
             specific_files: None,
             ignore_patterns,
@@ -43,8 +43,8 @@ impl Scanner {
         let custom_rules = load_custom_rules(Path::new(&root_path))?;
         let ignore_patterns = IgnorePatterns::load(Path::new(&root_path))?;
 
-        Ok(Self { 
-            root_path, 
+        Ok(Self {
+            root_path,
             custom_rules,
             specific_files: Some(files),
             ignore_patterns,
@@ -103,12 +103,12 @@ impl Scanner {
     fn should_scan(&self, path: &Path) -> bool {
         // Skip common directories
         let path_str = path.to_string_lossy();
-        
+
         // Check ignore patterns
         if self.ignore_patterns.should_ignore(&path_str) {
             return false;
         }
-        
+
         if path_str.contains("/node_modules/")
             || path_str.contains("/target/")
             || path_str.contains("/.git/")
@@ -148,7 +148,8 @@ impl Scanner {
                     let matched = captures.get(0).map(|m| m.as_str()).unwrap_or("");
 
                     // Filter out safe HTTP URLs
-                    if pattern.title == "Insecure HTTP Connection" && self.is_safe_http_url(matched) {
+                    if pattern.title == "Insecure HTTP Connection" && self.is_safe_http_url(matched)
+                    {
                         continue;
                     }
 
