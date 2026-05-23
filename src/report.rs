@@ -114,23 +114,18 @@ impl Report {
             issue.risk_score,
             issue.title.bold()
         );
-        println!(
-            "   {}: {}:{}",
-            "File".dimmed(),
-            issue.file,
-            issue.line
-        );
+        println!("   {}: {}:{}", "File".dimmed(), issue.file, issue.line);
         println!("   {}: {}", "Code".dimmed(), issue.code.dimmed());
         if !issue.matched.is_empty() && issue.matched != issue.code {
             println!("   {}: {}", "Match".dimmed(), issue.matched.yellow());
         }
         println!("   {}: {}", "Risk".dimmed(), issue.description);
-        
+
         // Print fix suggestion if available
         if let Some(fix) = &issue.fix_suggestion {
             println!("   {}: {}", "Fix".green().bold(), fix.green());
         }
-        
+
         println!();
     }
 }

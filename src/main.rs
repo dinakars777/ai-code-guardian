@@ -2,16 +2,16 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::*;
 
-mod scanner;
-mod patterns;
-mod report;
-mod tui;
-mod watch;
+mod constants;
 mod custom_rules;
+mod deps;
 mod git;
 mod ignore;
-mod deps;
-mod constants;
+mod patterns;
+mod report;
+mod scanner;
+mod tui;
+mod watch;
 
 use scanner::Scanner;
 
@@ -57,7 +57,7 @@ enum Commands {
         #[arg(short, long)]
         staged: bool,
     },
-    
+
     /// Watch directory for changes and scan automatically
     Watch {
         /// Directory to watch (default: current directory)
@@ -84,13 +84,20 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Scan { path, json, verbose, interactive, git, staged } => {
+        Commands::Scan {
+            path,
+            json,
+            verbose,
+            interactive,
+            git,
+            staged,
+        } => {
             let scanner = if git || staged {
                 if !git::is_git_repo(&path) {
                     eprintln!("Error: Not a git repository");
                     std::process::exit(1);
                 }
-                
+
                 let files = if staged {
                     git::get_staged_files(&path)?
                 } else {
@@ -141,29 +148,35 @@ fn main() -> Result<()> {
 
 fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
     use std::path::Path;
-    
+
     let path = Path::new(file_path);
-    
+
     if !path.exists() {
         anyhow::bail!("File not found: {}", file_path);
     }
 
     if !json_output {
-        println!("{}", "🛡️  AI Code Guardian - Dependency Check".cyan().bold());
+        println!(
+            "{}",
+            "🛡️  AI Code Guardian - Dependency Check".cyan().bold()
+        );
         println!();
         println!("Checking: {}", file_path.yellow());
         println!();
     }
 
     let dependencies = deps::parse_dependencies(path)?;
-    
+
     if dependencies.is_empty() {
         println!("No dependencies found");
         return Ok(());
     }
 
     if !json_output {
-        println!("Found {} dependencies, checking for vulnerabilities...", dependencies.len());
+        println!(
+            "Found {} dependencies, checking for vulnerabilities...",
+            dependencies.len()
+        );
         println!();
     }
 
@@ -178,10 +191,10 @@ fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
         }
 
         let vulns = deps::check_vulnerability(&client, dep)?;
-        
+
         if !vulns.is_empty() {
             total_vulns += vulns.len();
-            
+
             if json_output {
                 results.push(serde_json::json!({
                     "package": &dep.name,
@@ -199,9 +212,14 @@ fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
                     };
 
                     println!("❌ {}: {}", severity_colored, vuln.id.red().bold());
-                    println!("   Package: {}@{} ({})", dep.name.cyan(), dep.version, dep.ecosystem);
+                    println!(
+                        "   Package: {}@{} ({})",
+                        dep.name.cyan(),
+                        dep.version,
+                        dep.ecosystem
+                    );
                     println!("   Summary: {}", vuln.summary);
-                    
+
                     if !vuln.references.is_empty() {
                         println!("   References:");
                         for reference in &vuln.references {
@@ -215,17 +233,29 @@ fn check_dependencies(file_path: &str, json_output: bool) -> Result<()> {
     }
 
     if json_output {
-        println!("{}", serde_json::to_string_pretty(&serde_json::json!({
-            "total_dependencies": dependencies.len(),
-            "vulnerable_packages": results.len(),
-            "total_vulnerabilities": total_vulns,
-            "results": results,
-        }))?);
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&serde_json::json!({
+                "total_dependencies": dependencies.len(),
+                "vulnerable_packages": results.len(),
+                "total_vulnerabilities": total_vulns,
+                "results": results,
+            }))?
+        );
     } else {
         if total_vulns == 0 {
             println!("{}", "✅ No known vulnerabilities found!".green().bold());
         } else {
-            println!("{}", format!("Found {} vulnerabilities in {} packages", total_vulns, results.len()).red().bold());
+            println!(
+                "{}",
+                format!(
+                    "Found {} vulnerabilities in {} packages",
+                    total_vulns,
+                    results.len()
+                )
+                .red()
+                .bold()
+            );
             std::process::exit(1);
         }
     }

@@ -5,8 +5,8 @@ use std::path::Path;
 use std::sync::mpsc::channel;
 use std::time::Duration;
 
-use crate::scanner::Scanner;
 use crate::constants::SCANNABLE_EXTENSIONS;
+use crate::scanner::Scanner;
 
 pub fn watch_directory(path: &str, verbose: bool) -> Result<()> {
     println!("{}", "🛡️  AI Code Guardian - Watch Mode".cyan().bold());
@@ -35,9 +35,11 @@ pub fn watch_directory(path: &str, verbose: bool) -> Result<()> {
                     println!();
                     println!("{}", "📝 File changed, rescanning...".yellow());
                     println!();
-                    
+
                     // Scan only the changed files
-                    let changed_files: Vec<String> = event.paths.iter()
+                    let changed_files: Vec<String> = event
+                        .paths
+                        .iter()
                         .filter_map(|p| {
                             p.strip_prefix(path)
                                 .ok()
@@ -45,13 +47,13 @@ pub fn watch_directory(path: &str, verbose: bool) -> Result<()> {
                                 .map(|s| s.to_string())
                         })
                         .collect();
-                    
+
                     if !changed_files.is_empty() {
                         if let Err(e) = run_scan_files(path, &changed_files, verbose) {
                             eprintln!("{}: {}", "Error".red(), e);
                         }
                     }
-                    
+
                     println!();
                     println!("{}", "👀 Watching for changes...".green());
                     println!();
@@ -65,17 +67,15 @@ pub fn watch_directory(path: &str, verbose: bool) -> Result<()> {
 
 fn should_scan(event: &Event) -> bool {
     // Only scan on modify and create events
-    matches!(
-        event.kind,
-        EventKind::Modify(_) | EventKind::Create(_)
-    ) && event.paths.iter().any(|p| {
-        if let Some(ext) = p.extension() {
-            let ext = ext.to_string_lossy().to_lowercase();
-            SCANNABLE_EXTENSIONS.contains(&ext.as_str())
-        } else {
-            false
-        }
-    })
+    matches!(event.kind, EventKind::Modify(_) | EventKind::Create(_))
+        && event.paths.iter().any(|p| {
+            if let Some(ext) = p.extension() {
+                let ext = ext.to_string_lossy().to_lowercase();
+                SCANNABLE_EXTENSIONS.contains(&ext.as_str())
+            } else {
+                false
+            }
+        })
 }
 
 fn run_scan(path: &str, verbose: bool) -> Result<()> {

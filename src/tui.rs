@@ -129,13 +129,16 @@ pub fn run_tui(report: Report) -> Result<()> {
     let real_issues = app.get_real_issues();
     println!("\n📊 Summary:");
     println!("Total issues: {}", app.issues.len());
-    println!("Marked as false positives: {}", app.marked_false_positives.len());
+    println!(
+        "Marked as false positives: {}",
+        app.marked_false_positives.len()
+    );
     println!("Real issues: {}", real_issues.len());
 
     // Check if there are high-risk real issues
-    let has_high_risk = real_issues.iter().any(|issue| {
-        matches!(issue.severity, Severity::High)
-    });
+    let has_high_risk = real_issues
+        .iter()
+        .any(|issue| matches!(issue.severity, Severity::High));
 
     if has_high_risk {
         std::process::exit(1);
@@ -144,10 +147,7 @@ pub fn run_tui(report: Report) -> Result<()> {
     Ok(())
 }
 
-fn run_app<B: ratatui::backend::Backend>(
-    terminal: &mut Terminal<B>,
-    app: &mut App,
-) -> Result<()> {
+fn run_app<B: ratatui::backend::Backend>(terminal: &mut Terminal<B>, app: &mut App) -> Result<()> {
     loop {
         terminal.draw(|f| ui(f, app))?;
 
@@ -176,7 +176,11 @@ fn ui(f: &mut Frame, app: &mut App) {
 
     // Header
     let header = Paragraph::new("🛡️  AI Code Guardian - Interactive Mode")
-        .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
+        .style(
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        )
         .block(Block::default().borders(Borders::ALL));
     f.render_widget(header, chunks[0]);
 
@@ -198,10 +202,7 @@ fn ui(f: &mut Frame, app: &mut App) {
                 "  "
             };
 
-            let content = format!(
-                "{}{} - {}:{}",
-                prefix, issue.title, issue.file, issue.line
-            );
+            let content = format!("{}{} - {}:{}", prefix, issue.title, issue.file, issue.line);
 
             ListItem::new(content).style(Style::default().fg(severity_color))
         })
@@ -235,7 +236,12 @@ fn ui(f: &mut Frame, app: &mut App) {
                 ]),
                 Line::from(""),
                 Line::from(vec![
-                    Span::styled("Fix: ", Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+                    Span::styled(
+                        "Fix: ",
+                        Style::default()
+                            .fg(Color::Green)
+                            .add_modifier(Modifier::BOLD),
+                    ),
                     Span::styled(
                         issue.fix_suggestion.as_deref().unwrap_or("N/A"),
                         Style::default().fg(Color::Green),
