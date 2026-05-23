@@ -184,13 +184,14 @@ No data leaves your machine. Everything runs locally.
 
 ## Roadmap
 
-- [x] Git integration to scan only changed files
-- [x] GitHub Actions examples
-- [ ] Auto-fix command to apply fixes automatically
-- [ ] XSS detection patterns
-- [ ] Path traversal detection
-- [ ] Official GitHub Action (no cargo install needed)
-- [ ] VS Code extension
+See [ROADMAP.md](ROADMAP.md) for the current prioritized project roadmap.
+
+Near-term focus areas:
+- Expand parser and rule fixture coverage
+- Harden dependency scanning with lockfile and OSV batch-query support
+- Add SARIF and CI severity-threshold controls
+- Build an official GitHub Action
+- Add precise XSS and path traversal detection
 
 ## Contributing
 
