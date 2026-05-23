@@ -1,5 +1,5 @@
-use regex::Regex;
 use crate::report::Severity;
+use regex::Regex;
 
 pub struct Pattern {
     pub title: &'static str,
@@ -43,7 +43,7 @@ lazy_static::lazy_static! {
             title: "Hardcoded Secret",
             description: "Secret or password found in source code.",
             severity: Severity::High,
-            regex: Regex::new(r#"(?i)(password|passwd|pwd|secret|token)\s*[=:]\s*["'](?!true|false|null|none|nil|<[^>]+>|\$\{[^}]+\}|\{\{[^}]+\}\}|Bearer|Basic)([^"'\s]{8,})["']"#).unwrap(),
+            regex: Regex::new(r#"(?i)(password|passwd|pwd|secret|token)\s*[=:]\s*["']([^"'\s]{8,})["']"#).unwrap(),
             fix_suggestion: "Use environment variables: process.env.SECRET_KEY",
         },
         

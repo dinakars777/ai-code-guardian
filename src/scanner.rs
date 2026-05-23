@@ -3,11 +3,11 @@ use std::fs;
 use std::path::Path;
 use walkdir::WalkDir;
 
-use crate::patterns::PATTERNS;
-use crate::report::{Issue, Report, Severity};
+use crate::constants::SCANNABLE_EXTENSIONS;
 use crate::custom_rules::{load_custom_rules, CompiledRule};
 use crate::ignore::IgnorePatterns;
-use crate::constants::SCANNABLE_EXTENSIONS;
+use crate::patterns::PATTERNS;
+use crate::report::{Issue, Report, Severity};
 
 pub struct Scanner {
     root_path: String,
@@ -157,6 +157,14 @@ impl Scanner {
                         continue;
                     }
 
+                    if pattern.title == "Hardcoded Secret" {
+                        if let Some(secret_value) = captures.get(2) {
+                            if self.is_safe_secret_value(secret_value.as_str()) {
+                                continue;
+                            }
+                        }
+                    }
+
                     issues.push(Issue {
                         severity: pattern.severity.clone(),
                         title: pattern.title.to_string(),
@@ -218,7 +226,7 @@ impl Scanner {
                 // Check if it's in 172.16.0.0 - 172.31.255.255 range
                 if let Some(second_octet) = ip.split('.').nth(1) {
                     if let Ok(num) = second_octet.parse::<u8>() {
-                        num >= 16 && num <= 31
+                        (16..=31).contains(&num)
                     } else {
                         false
                     }
@@ -226,5 +234,85 @@ impl Scanner {
                     false
                 }
             })
+    }
+
+    fn is_safe_secret_value(&self, value: &str) -> bool {
+        let lower_value = value.to_ascii_lowercase();
+
+        matches!(
+            lower_value.as_str(),
+            "true" | "false" | "null" | "none" | "nil" | "bearer" | "basic"
+        ) || (value.starts_with('<') && value.ends_with('>'))
+            || (value.starts_with("${") && value.ends_with('}'))
+            || (value.starts_with("{{") && value.ends_with("}}"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+    use std::path::PathBuf;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn test_dir(name: &str) -> PathBuf {
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = env::temp_dir().join(format!("ai-code-guardian-{name}-{suffix}"));
+        fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn scanner_initializes_builtin_patterns_without_panicking() {
+        let dir = test_dir("pattern-init");
+        fs::write(dir.join("main.rs"), "fn main() {}\n").unwrap();
+
+        let scanner = Scanner::new(dir.to_str().unwrap()).unwrap();
+        let report = scanner.scan(false).unwrap();
+
+        assert_eq!(report.files_scanned, 1);
+        assert!(report.issues.is_empty());
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn hardcoded_secret_ignores_placeholder_values() {
+        let dir = test_dir("placeholder-secret");
+        fs::write(
+            dir.join("config.rs"),
+            r#"
+const PASSWORD: &str = "<redacted>";
+const TOKEN: &str = "${API_TOKEN}";
+const SECRET: &str = "{{SECRET}}";
+"#,
+        )
+        .unwrap();
+
+        let scanner = Scanner::new(dir.to_str().unwrap()).unwrap();
+        let report = scanner.scan(false).unwrap();
+
+        assert!(report.issues.is_empty());
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn hardcoded_secret_reports_real_values() {
+        let dir = test_dir("real-secret");
+        fs::write(dir.join("config.rs"), r#"let token = "supersecretvalue";"#).unwrap();
+
+        let scanner = Scanner::new(dir.to_str().unwrap()).unwrap();
+        let report = scanner.scan(false).unwrap();
+
+        assert!(report
+            .issues
+            .iter()
+            .any(|issue| issue.title == "Hardcoded Secret"));
+
+        let _ = fs::remove_dir_all(dir);
     }
 }
